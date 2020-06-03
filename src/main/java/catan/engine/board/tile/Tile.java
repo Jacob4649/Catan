@@ -1,8 +1,8 @@
 package catan.engine.board.tile;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Stack;
 
 /**
@@ -51,7 +51,7 @@ public class Tile {
 		
 		int arrayIndex = 0;
 		
-		for (int i = 0; i < number % frequencyRange.length; i++) {
+		for (int i = 0; i < number / frequencyRange.length; i++) {
 			for (int j = 0; j < frequencyRange.length; j++) {
 				frequencies[arrayIndex] = frequencyRange[j];
 				arrayIndex++;
@@ -65,16 +65,25 @@ public class Tile {
 		}
 		
 		Collections.shuffle(unevenInt);
-		
+
 		while (arrayIndex < frequencies.length) {
 			frequencies[arrayIndex] = unevenInt.pop();
 			arrayIndex++;
 		}
 		
-		List<int[]> tempFrequencies = Arrays.asList(frequencies);
+		ArrayList<Integer> tempFrequencies = new ArrayList<Integer>();
+		
+		for (int i : frequencies) {
+			tempFrequencies.add(i);
+		}
+		
 		Collections.shuffle(tempFrequencies);
 		
-		return Arrays.stream(tempFrequencies.toArray()).mapToInt((object) -> (int) object).toArray();
+		for (int i = 0; i < frequencies.length; i++) {
+			frequencies[i] = tempFrequencies.get(i);
+		}
+		
+		return frequencies;
 	}
 
 }

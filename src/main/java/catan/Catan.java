@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
+import catan.engine.board.tile.Tile;
+import catan.engine.board.tile.TileType;
 import catan.engine.player.Player;
 import catan.engine.player.PlayerColor;
 import catan.engine.player.PlayerCountOutOfBoundsException;
@@ -103,6 +105,6 @@ public class Catan {
 	}
 
 	public static void main(String[] args) {
-
+		
 	}
 }
