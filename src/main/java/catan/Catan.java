@@ -1,10 +1,15 @@
 package catan;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
+import catan.engine.board.Board;
+import catan.engine.board.BoardNotInitializedException;
+import catan.engine.board.IO;
 import catan.engine.board.tile.Tile;
+import catan.engine.board.tile.TileNotInitializedException;
 import catan.engine.board.tile.TileType;
 import catan.engine.player.Player;
 import catan.engine.player.PlayerColor;
@@ -36,6 +41,7 @@ public class Catan {
 	public static final int NORMAL_PLAYERS = 4;
 
 	private Player[] m_players;
+	private int m_playerIndex = -1;
 	
 	/**
 	 * Creates a new game of {@link Catan} with the specified players
@@ -60,6 +66,7 @@ public class Catan {
 		}
 
 		m_players = players;
+		m_playerIndex = playerIndex;
 	}
 
 	/**

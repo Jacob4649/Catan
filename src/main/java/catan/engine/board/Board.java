@@ -1,6 +1,11 @@
 package catan.engine.board;
 
+import java.util.ArrayList;
+
+import catan.Catan;
+import catan.engine.board.objects.BoardObject;
 import catan.engine.board.tile.Tile;
+import catan.engine.board.tile.TileNotInitializedException;
 
 /**
  * Class representing the board for a game of {@link Catan} Tile positions are
@@ -12,33 +17,46 @@ import catan.engine.board.tile.Tile;
 public class Board {
 
 	private Tile[][] m_tileMap;
+	private ArrayList<BoardObject> m_objects;
 
 	/**
-	 * Converts from index on `m_tileMap` to position on game map
-	 * 
-	 * @param index
-	 *            array containing int indices
-	 * @return array containing int positions
+	 * Creates a new {@link Board}
+	 * @param map the {@link Tile}s to populate the {@link Board} with
 	 */
-	public int[] indexToPosition(int[] index) {
-
-		int longestRow = 0; // size of the longest row on the map
-
-		for (Tile[] row : m_tileMap) {
-			longestRow = Math.max(longestRow, row.length);
-		}
-
-		/* How the math works:
-		 *
-		 * index of the middle element, or greater middle element in the row
-		 * int middleElement = m_tileMap[index[0]].length / 2;
-		 *
-		 * int middleDistance = index[0] - middleElement;
-		 *
-		 * int longestMiddle = longestRow / 2;
-		 *
-		 * return new int[] {index[0], longestMiddle + middleDistance}; */
-		
-		return new int[] {index[0], (longestRow / 2) + (index[0] - (m_tileMap[index[0]].length / 2))};
+	public Board(Tile[][] map) {
+		m_tileMap = map;
 	}
+	
+	/**
+	 * 
+	 * @return an int array containing the dimensions of the map {rows, cols}
+	 * @throws BoardNotInitializedException
+	 *             if the board has not been initialized
+	 */
+	public int[] getDimensions() throws BoardNotInitializedException {
+		try {
+			return new int[] { m_tileMap.length, m_tileMap[0].length };
+		} catch (ArrayIndexOutOfBoundsException e) {
+			throw new BoardNotInitializedException();
+		}
+	}
+
+	/**
+	 * Gets the {@link Tile} at the specified position
+	 * 
+	 * @param row
+	 *            the row
+	 * @param col
+	 *            the column
+	 * @return the {@link Tile}
+	 * @throws TileNotInitializedException
+	 *             if the tile has not been initialized
+	 */
+	public Tile getTileAt(int row, int col) throws TileNotInitializedException, BoardNotInitializedException {
+		if (m_tileMap[row][col] == null) {
+			throw new TileNotInitializedException(row, col);
+		}
+		return m_tileMap[row][col];
+	}
+
 }

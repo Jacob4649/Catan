@@ -16,8 +16,36 @@ public class Tile {
 	public static final int FREQUENCY_MIN = 2;
 	public static final int FREQUENCY_MAX = 12;
 
-	private int m_frequency;
+	private int m_frequency = -1;
 	private TileType m_type;
+
+	/**
+	 * 
+	 * @return the frequency of this tile
+	 * @throws TileNotInitializedException
+	 *             if the tile has not been initialized
+	 */
+	public int getFrequency() throws TileNotInitializedException {
+		if (m_frequency != -1) {
+			return m_frequency;
+		} else {
+			throw new TileNotInitializedException();
+		}
+	}
+
+	/**
+	 * 
+	 * @return the {@link TileType} of this tile
+	 * @throws TileNotInitializedException
+	 *             if the tile has not been initialized
+	 */
+	public TileType getTileType() throws TileNotInitializedException {
+		if (m_type != null) {
+			return m_type;
+		} else {
+			throw new TileNotInitializedException();
+		}
+	}
 
 	/**
 	 * Creates a {@link Tile} with the specified frequency and type
@@ -44,45 +72,45 @@ public class Tile {
 	public static int[] getFrequencies(int number) {
 		int[] frequencies = new int[number];
 		int[] frequencyRange = new int[FREQUENCY_MAX - FREQUENCY_MIN + 1];
-		
+
 		for (int i = 0; i < frequencyRange.length; i++) {
 			frequencyRange[i] = FREQUENCY_MIN + i;
 		}
-		
+
 		int arrayIndex = 0;
-		
+
 		for (int i = 0; i < number / frequencyRange.length; i++) {
 			for (int j = 0; j < frequencyRange.length; j++) {
 				frequencies[arrayIndex] = frequencyRange[j];
 				arrayIndex++;
 			}
 		}
-		
+
 		Stack<Integer> unevenInt = new Stack<Integer>();
-		
+
 		for (int i = 0; i < frequencyRange.length; i++) {
 			unevenInt.add(frequencyRange[i]);
 		}
-		
+
 		Collections.shuffle(unevenInt);
 
 		while (arrayIndex < frequencies.length) {
 			frequencies[arrayIndex] = unevenInt.pop();
 			arrayIndex++;
 		}
-		
+
 		ArrayList<Integer> tempFrequencies = new ArrayList<Integer>();
-		
+
 		for (int i : frequencies) {
 			tempFrequencies.add(i);
 		}
-		
+
 		Collections.shuffle(tempFrequencies);
-		
+
 		for (int i = 0; i < frequencies.length; i++) {
 			frequencies[i] = tempFrequencies.get(i);
 		}
-		
+
 		return frequencies;
 	}
 

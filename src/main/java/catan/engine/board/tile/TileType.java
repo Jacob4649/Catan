@@ -12,7 +12,34 @@ import java.util.Stack;
  *
  */
 public enum TileType {
-	DESERT, FOREST, PASTURE, CLAY, FIELD, QUARRY;
+	DESERT(0), FOREST(1), PASTURE(2), CLAY(3), FIELD(4), QUARRY(5), COAST(6), OCEAN(7);
+
+	private int m_value;
+
+	private TileType(int value) {
+		m_value = value;
+	}
+
+	public int getValue() {
+		return m_value;
+	}
+
+	/**
+	 * Gets the {@link TileType} with the specified value
+	 * 
+	 * @param i
+	 *            the value
+	 * @return the {@link TileType} with a value of i, null if no
+	 *         {@link TileType} has the desired value
+	 */
+	public static TileType getWithValue(int i) {
+		for (TileType type : TileType.values()) {
+			if (type.getValue() == i) {
+				return type;
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * Gets a specific number of evenly distributed {@link TileType}s
@@ -50,7 +77,7 @@ public enum TileType {
 		for (int i = 0; i < types.length; i++) {
 			types[i] = tempTypes.get(i);
 		}
-		
+
 		return types;
 	}
 }
