@@ -8,13 +8,16 @@ import java.awt.Graphics2D;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import catan.Catan;
@@ -27,6 +30,7 @@ import catan.engine.board.objects.BoardObjectNotInitializedException;
 import catan.engine.board.tile.Tile;
 import catan.engine.board.tile.TileNotInitializedException;
 import catan.engine.board.tile.TileType;
+import catan.engine.board.tile.Vertex;
 import catan.renderer.Colors;
 
 /**
@@ -65,6 +69,17 @@ public class BoardPanel extends JPanel {
 		setBorder(BorderFactory.createLineBorder(Colors.BOARD_BORDER_COLOR));
 		setBackground(Colors.BOARD_EMPTY_COLOR);
 
+		//Deselect keybinding
+		getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                "deselect");
+		getActionMap().put("deselect", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				m_selected = null;
+			}
+		});
+		
+		//mouse listener
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent event) {
