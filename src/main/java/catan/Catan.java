@@ -111,6 +111,14 @@ public class Catan {
 	public Player[] getPlayers() {
 		return m_players;
 	}
+	
+	/**
+	 * 
+	 * @return the user's {@link Player}
+	 */
+	public Player getPlayer() {
+		return m_players[m_playerIndex];
+	}
 
 	/**
 	 * 
@@ -143,11 +151,19 @@ public class Catan {
 
 		catan.setBoard(Board.randomLandBoard());
 
-		catan.getBoard().addObject(new Village(catan.getPlayers()[0], catan.getBoard().getVertex(5, 5)));
+		catan.getBoard().addObject(new Village(catan.getPlayer(), catan.getBoard().getVertex(5, 5)));
 		
 		JFrame frame = new JFrame("Catan");
 
-		frame.getContentPane().add(new BoardPanel(catan.getBoard()));
+		frame.getContentPane().add(new BoardPanel(catan.getBoard()){
+			{
+				setPreSelection(true);
+				setSelectVertex(true);
+				setOnVertexSelectedListener((row, col) -> {
+					getBoard().addObject(new Village(catan.getPlayer(), getBoard().getVertex(row, col)));
+				});
+			}
+		});
 		frame.pack();
 
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

@@ -21,6 +21,8 @@ public class Colors {
 	
 	public static final Color BOARD_SELECTED_COLOR = Color.YELLOW;
 	
+	public static final Color BOARD_PRE_SELECTED_COLOR = Color.ORANGE;
+	
 	public static final Color OCEAN_COLOR = Color.BLUE;
 	
 	public static final Color COAST_COLOR = Color.YELLOW;

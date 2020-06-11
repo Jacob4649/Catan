@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import catan.Catan;
 import catan.engine.board.objects.BoardObject;
+import catan.engine.board.objects.BoardObjectMatcher;
 import catan.engine.board.tile.Tile;
 import catan.engine.board.tile.TileNotInitializedException;
 import catan.engine.board.tile.TileType;
@@ -68,7 +69,7 @@ public class Board {
 	 * 
 	 * @return an int array containing the dimensions of the map {rows, cols}
 	 * @throws BoardNotInitializedException
-	 *             if the board has not been initialized
+	 *             if the {@link Board} has not been initialized
 	 */
 	public int[] getDimensions() throws BoardNotInitializedException {
 		try {
@@ -76,6 +77,17 @@ public class Board {
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new BoardNotInitializedException();
 		}
+	}
+
+	/**
+	 * 
+	 * @return an int array containing the dimensions of the {@link Vertex}
+	 *         (Vertices) on the map {rows, col}
+	 * @throws BoardNotInitializedException
+	 *             if the {@link Board} has not been initialized
+	 */
+	public int[] getVertexDimensions() throws BoardNotInitializedException {
+		return new int[] { getDimensions()[0] + 1, getDimensions()[1] + 1 };
 	}
 
 	/**
@@ -241,6 +253,23 @@ public class Board {
 		return new Vertex(row, column, this);
 	}
 
+	/**
+	 * Gets all {@link BoardObject} matching a set condition
+	 * @param matcher a {@link BoardMatcher} containing the condition
+	 * @return array containing all matching {@link BoardObject}s
+	 */
+	public BoardObject[] getAllObjectsMatching(BoardObjectMatcher matcher) {
+		ArrayList<BoardObject> objects = new ArrayList<BoardObject>();
+		for (BoardObject object : m_objects) {
+			if (matcher.matches(object)) {
+				objects.add(object);
+			}
+		}
+		BoardObject[] output = new BoardObject[objects.size()];
+		output = objects.toArray(output);
+		return output;
+	}
+	
 	@Override
 	public String toString() {
 		return "Board";

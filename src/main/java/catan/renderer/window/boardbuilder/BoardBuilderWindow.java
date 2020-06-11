@@ -3,7 +3,7 @@ package catan.renderer.window.boardbuilder;
 import javax.swing.JFrame;
 
 import catan.engine.board.BoardBuilder;
-import catan.engine.board.SelectedTileListener;
+import catan.engine.board.SelectedPositionListener;
 import catan.renderer.panel.BoardPanel;
 
 /**
@@ -45,10 +45,10 @@ public class BoardBuilderWindow extends JFrame {
 	}
 	
 	/**
-	 * Sets the {@link SelectedTileListener} for this window's associated {@link BoardBuilder}
+	 * Sets the {@link SelectedPositionListener} for this window's associated {@link BoardBuilder}
 	 * @param listener the listener to assign
 	 */
-	public void setOnTileSelectedListener(SelectedTileListener listener) {
+	public void setOnTileSelectedListener(SelectedPositionListener listener) {
 		m_panel.setOnTileSelectedListener(listener);
 	}
 	

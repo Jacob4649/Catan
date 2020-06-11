@@ -5,19 +5,23 @@ import java.awt.BasicStroke;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import catan.Catan;
 import catan.engine.board.Board;
 import catan.engine.board.BoardNotInitializedException;
 import catan.engine.board.SelectedBoardObjectListener;
-import catan.engine.board.SelectedTileListener;
+import catan.engine.board.SelectedPositionListener;
 import catan.engine.board.objects.BoardObject;
 import catan.engine.board.objects.BoardObjectNotInitializedException;
 import catan.engine.board.tile.Tile;
@@ -36,13 +40,18 @@ public class BoardPanel extends JPanel {
 	public static final int PANEL_HORIZONTAL = 800;
 	public static final int PANEL_VERTICAL = 600;
 
+	private static final double VERTEX_INDICATOR_RELATIVE_SIZE = 0.4;
+
 	private boolean m_mouseLock = false;
-	private int[] m_selectedTile;
+	private boolean m_preSelectionIndicator = false;
+	private boolean m_selectVertex = false;
+	private int[] m_selected;
 	private BoardObject m_selectedObject;
-	private SelectedTileListener m_selectedTileListener;
+	private SelectedPositionListener m_selectedTileListener;
+	private SelectedPositionListener m_selectedVertexListener;
 	private SelectedBoardObjectListener m_selectedObjectListener;
 
-	Board m_board;
+	private Board m_board;
 
 	/**
 	 * Creates a {@link BoardPanel} that will show the specified {@link Catan}
@@ -63,9 +72,9 @@ public class BoardPanel extends JPanel {
 					m_mouseLock = true;
 					new Thread(() -> {
 
-						m_selectedTile = null;
+						m_selected = null;
 						m_selectedObject = null;
-						
+
 						// check selected objects
 						for (BoardObject object : m_board.getObjects()) {
 							try {
@@ -89,12 +98,19 @@ public class BoardPanel extends JPanel {
 							}
 						}
 
-						// check selected tiles
+						// check selected tiles or vertices
 
 						try {
-							m_selectedTile = pixelToPos(event.getX(), event.getY());
-							if (m_selectedTileListener != null) {
-								m_selectedTileListener.onSelect(m_selectedTile[0], m_selectedTile[1]);
+							if (m_selectVertex) {
+								m_selected = pixelToVertex(event.getX(), event.getY());
+								if (m_selectedVertexListener != null) {
+									m_selectedVertexListener.onSelect(m_selected[0], m_selected[1]);
+								}
+							} else {
+								m_selected = pixelToPos(event.getX(), event.getY());
+								if (m_selectedTileListener != null) {
+									m_selectedTileListener.onSelect(m_selected[0], m_selected[1]);
+								}	
 							}
 						} catch (BoardNotInitializedException | TileNotInitializedException e) {
 							e.printStackTrace();
@@ -160,21 +176,30 @@ public class BoardPanel extends JPanel {
 				} catch (BoardObjectNotInitializedException e) {
 				}
 			}
-			
-			// paint selected tile or vertex
-			if (m_selectedTile != null) {
+
+			// paint selected tile, vertex, or object
+			if (m_selected != null) {
 				g2D.setColor(Colors.BOARD_SELECTED_COLOR);
 				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.75f));
 				g2D.setStroke(new BasicStroke(5f));
 
 				int[] tileDimensions = Tile.getTilePixelDimensions(m_board.getDimensions(),
 						new int[] { getWidth(), getHeight() });
-
-				g2D.drawRect((int) (((float) m_selectedTile[1] / (float) m_board.getDimensions()[1]) * getWidth()),
-						(int) (((float) m_selectedTile[0] / (float) m_board.getDimensions()[0]) * getHeight()),
-						tileDimensions[0], tileDimensions[1]);
+				if (m_selectVertex) {
+					g2D.drawRect(
+							(int) ((((double) m_selected[1] / (double) m_board.getDimensions()[1]) * (double) getWidth())
+									- (VERTEX_INDICATOR_RELATIVE_SIZE * ((double) (tileDimensions[0]) / 2d))),
+							(int) ((((double) m_selected[0] / (double) m_board.getDimensions()[0]) * (double) getHeight())
+									- (VERTEX_INDICATOR_RELATIVE_SIZE * ((double) (tileDimensions[1])) / 2d)),
+							(int) (VERTEX_INDICATOR_RELATIVE_SIZE * ((double) (tileDimensions[0]))),
+							(int) (VERTEX_INDICATOR_RELATIVE_SIZE * ((double) (tileDimensions[1]))));
+				} else {
+					g2D.drawRect((int) (((float) m_selected[1] / (float) m_board.getDimensions()[1]) * getWidth()),
+							(int) (((float) m_selected[0] / (float) m_board.getDimensions()[0]) * getHeight()),
+							tileDimensions[0], tileDimensions[1]);	
+				}
 			}
-			
+
 			if (m_selectedObject != null) {
 				try {
 					g2D.setColor(Colors.BOARD_SELECTED_COLOR);
@@ -186,10 +211,49 @@ public class BoardPanel extends JPanel {
 					int[] objectDimensions = m_selectedObject.getImageDimensions(m_board.getDimensions(),
 							new int[] { getWidth(), getHeight() });
 
-					g2D.drawRect(objectPosition[0], objectPosition[1], objectDimensions[0], objectDimensions[1]);	
+					g2D.drawRect(objectPosition[0], objectPosition[1], objectDimensions[0], objectDimensions[1]);
 				} catch (BoardObjectNotInitializedException e) {
 					e.printStackTrace();
 					System.exit(0);
+				}
+			}
+
+			// paint preselection indicator
+			if (m_preSelectionIndicator) {
+				g2D.setColor(Colors.BOARD_PRE_SELECTED_COLOR);
+				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.75f));
+				g2D.setStroke(new BasicStroke(5f));
+				int[] tileDimensions = Tile.getTilePixelDimensions(m_board.getDimensions(),
+						new int[] { getWidth(), getHeight() });
+				Point p = MouseInfo.getPointerInfo().getLocation();
+				SwingUtilities.convertPointFromScreen(p, this);
+				if (m_selectVertex) {
+					// vertex mode
+					int[] mapDimensions = m_board.getDimensions();
+					int[] dimensions = m_board.getVertexDimensions();
+					int[] vertexPos = pixelToVertex((int) p.getX(), (int) p.getY());
+					// check bounds
+					if (vertexPos[0] >= 0 && vertexPos[0] < dimensions[0] && vertexPos[1] >= 0
+							&& vertexPos[1] < dimensions[1]) {
+						g2D.drawRect(
+								(int) ((((double) vertexPos[1] / (double) mapDimensions[1]) * (double) getWidth())
+										- (VERTEX_INDICATOR_RELATIVE_SIZE * ((double) (tileDimensions[0]) / 2d))),
+								(int) ((((double) vertexPos[0] / (double) mapDimensions[0]) * (double) getHeight())
+										- (VERTEX_INDICATOR_RELATIVE_SIZE * ((double) (tileDimensions[1])) / 2d)),
+								(int) (VERTEX_INDICATOR_RELATIVE_SIZE * ((double) (tileDimensions[0]))),
+								(int) (VERTEX_INDICATOR_RELATIVE_SIZE * ((double) (tileDimensions[1]))));
+					}
+				} else {
+					// tile mode
+					int[] dimensions = m_board.getDimensions();
+					int[] tilePos = pixelToPos((int) p.getX(), (int) p.getY());
+					// check bounds
+					if (tilePos[0] >= 0 && tilePos[0] < dimensions[0] && tilePos[1] >= 0
+							&& tilePos[1] < dimensions[1]) {
+						g2D.drawRect((int) (((float) tilePos[1] / (float) dimensions[1]) * getWidth()),
+								(int) (((float) tilePos[0] / (float) dimensions[0]) * getHeight()),
+								tileDimensions[0], tileDimensions[1]);
+					}
 				}
 			}
 
@@ -214,7 +278,7 @@ public class BoardPanel extends JPanel {
 	 *         {@link Tile} {row, col}, or null if no {@link Tile} is selected
 	 */
 	public int[] getSelectedTile() {
-		return m_selectedTile;
+		return m_selected;
 	}
 
 	/**
@@ -238,19 +302,65 @@ public class BoardPanel extends JPanel {
 	}
 
 	/**
-	 * Sets the {@link SelectedTileListener} for this {@link BoardPanel}
+	 * Sets the {@link Tile} {@link SelectedPositionListener} for this
+	 * {@link BoardPanel}
 	 * 
 	 * @param listener
-	 *            the {@link SelectedTileListener} to assign
+	 *            the {@link SelectedPositionListener} to assign
 	 */
-	public void setOnTileSelectedListener(SelectedTileListener listener) {
+	public void setOnTileSelectedListener(SelectedPositionListener listener) {
 		m_selectedTileListener = listener;
 	}
 
+	/**
+	 * Sets the {@link SelectedBoardObjectListener} for this {@link BoardPanel}
+	 * 
+	 * @param listener
+	 *            the {@link SelectedObjectListener} to assign
+	 */
 	public void setOnObjectSelectedListener(SelectedBoardObjectListener listener) {
 		m_selectedObjectListener = listener;
 	}
 
+	/**
+	 * Sets the {@link Vertex} {@link SelectedPositionListener} for this
+	 * {@link BoardPanel}
+	 * 
+	 * @param listener
+	 *            the {@link SelectedPositionListener} to assign
+	 */
+	public void setOnVertexSelectedListener(SelectedPositionListener listener) {
+		m_selectedVertexListener = listener;
+	}
+
+	/**
+	 * Set whether {@link Vertex} (Vertices) or {@link Tile}s should be selected
+	 * 
+	 * @param select
+	 *            true for {@link Vertex} (vertices)
+	 */
+	public void setSelectVertex(boolean select) {
+		m_selectVertex = select;
+	}
+
+	/**
+	 * Set whether a pre selection indicator should be visible on the board
+	 * 
+	 * @param select
+	 *            true for visible
+	 */
+	public void setPreSelection(boolean select) {
+		m_preSelectionIndicator = select;
+	}
+
+	/**
+	 * 
+	 * @return the {@link Board} being used by this {@link BoardPanel}
+	 */
+	public Board getBoard() {
+		return m_board;
+	}
+	
 	/**
 	 * Converts an index of a horizontal {@link Tile} on the board to a point
 	 * 
@@ -287,11 +397,29 @@ public class BoardPanel extends JPanel {
 	 * @return an array containing the row and column of the {@link Tile} {row,
 	 *         col}
 	 * @throws BoardNotInitializedException
-	 *             if {@link Board} has not been initialized
+	 *             if the {@link Board} has not been initialized
 	 */
 	protected int[] pixelToPos(int hor, int vert) throws BoardNotInitializedException {
 		return new int[] { (int) (vert / (getHeight() / m_board.getDimensions()[0])),
 				(int) (hor / (getWidth() / m_board.getDimensions()[1])) };
+	}
+
+	/**
+	 * Gets the {@link Vertex} that the cursor is over
+	 * 
+	 * @param hor
+	 *            the horizontal pixel
+	 * @param vert
+	 *            the vertical pixel
+	 * @return an array containing the row and column of the {@link Vertex}
+	 *         {row, col}
+	 * @throws BoardNotInitializedException
+	 *             if the {@link Board} has not been initialized
+	 */
+	protected int[] pixelToVertex(int hor, int vert) throws BoardNotInitializedException {
+		return new int[] {
+				(int) (((double) vert / ((double) getHeight() / (double) m_board.getDimensions()[0])) + 0.5d),
+				(int) (((double) hor / ((double) getWidth() / (double) m_board.getDimensions()[1])) + 0.5d) };
 	}
 
 }

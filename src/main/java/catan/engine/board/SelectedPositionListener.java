@@ -5,20 +5,20 @@ import catan.engine.board.tile.TileNotInitializedException;
 import catan.renderer.panel.BoardPanel;
 
 /**
- * Interface for when a {@link Tile} on a {@link BoardPanel} is selected
+ * Interface for when a {@link Tile} or a {@link Vertex} on a {@link BoardPanel} is selected
  * 
  * @author Jacob
  *
  */
-public interface SelectedTileListener {
+public interface SelectedPositionListener {
 
 	/**
-	 * Runs when a {@link Tile} is selected
+	 * Runs when a {@link Tile} or {@link Vertex} is selected
 	 * 
 	 * @param row
-	 *            the row the {@link Tile} that has been selected is on
+	 *            the row the {@link Tile} or {@link Vertex} that has been selected is on
 	 * @param col
-	 *            the column the {@link Tile} that has been selected is on
+	 *            the column the {@link Tile} or {@link Vertex} that has been selected is on
 	 * @throws TileNotInitializedException
 	 *             when selected {@link Tile} has not been initialized
 	 */
