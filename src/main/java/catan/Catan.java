@@ -1,20 +1,20 @@
 package catan;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
+import javax.swing.JFrame;
+
 import catan.engine.board.Board;
 import catan.engine.board.BoardNotInitializedException;
-import catan.engine.board.IO;
-import catan.engine.board.tile.Tile;
-import catan.engine.board.tile.TileNotInitializedException;
-import catan.engine.board.tile.TileType;
+import catan.engine.board.objects.BoardObjectNotInitializedException;
+import catan.engine.board.objects.buildings.Village;
 import catan.engine.player.Player;
 import catan.engine.player.PlayerColor;
 import catan.engine.player.PlayerCountOutOfBoundsException;
 import catan.engine.player.PlayerIndexOutOfBoundsException;
+import catan.renderer.panel.BoardPanel;
 
 /**
  * Jacob Klimczak
@@ -41,8 +41,9 @@ public class Catan {
 	public static final int NORMAL_PLAYERS = 4;
 
 	private Player[] m_players;
+	private Board m_board;
 	private int m_playerIndex = -1;
-	
+
 	/**
 	 * Creates a new game of {@link Catan} with the specified players
 	 * 
@@ -88,7 +89,7 @@ public class Catan {
 					add(new Player(colorList.get(i)));
 				}
 			}
-		}).toArray());
+		}).toArray(new Player[playerNumber]));
 	}
 
 	/**
@@ -102,7 +103,7 @@ public class Catan {
 	public Catan() throws PlayerCountOutOfBoundsException, PlayerIndexOutOfBoundsException {
 		this(NORMAL_PLAYERS);
 	}
-	
+
 	/**
 	 * 
 	 * @return array containing all players
@@ -111,7 +112,52 @@ public class Catan {
 		return m_players;
 	}
 
-	public static void main(String[] args) {
+	/**
+	 * 
+	 * @return the {@link Board} for this game
+	 * @throws BoardNotInitializedException
+	 *             if the board has not been initialized
+	 */
+	public Board getBoard() throws BoardNotInitializedException {
+		if (m_board == null) {
+			throw new BoardNotInitializedException();
+		}
+		return m_board;
+	}
+
+	/**
+	 * Sets the {@link Board} for this game
+	 * 
+	 * @param board
+	 *            the {@link Board} to assign
+	 */
+	public void setBoard(Board board) {
+		m_board = board;
+	}
+
+	public static void main(String[] args)
+			throws PlayerCountOutOfBoundsException, PlayerIndexOutOfBoundsException, BoardNotInitializedException, BoardObjectNotInitializedException {
+
+		// start catan game
+		Catan catan = new Catan();
+
+		catan.setBoard(Board.randomLandBoard());
+
+		catan.getBoard().addObject(new Village(catan.getPlayers()[0], catan.getBoard().getVertex(5, 5)));
 		
+		JFrame frame = new JFrame("Catan");
+
+		frame.getContentPane().add(new BoardPanel(catan.getBoard()));
+		frame.pack();
+
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+		frame.setSize(BoardPanel.PANEL_HORIZONTAL + 5, BoardPanel.PANEL_VERTICAL + 25);
+
+		frame.setResizable(false);
+
+		frame.setVisible(true);
+
+		// new BoardBuilderWindow();
 	}
 }

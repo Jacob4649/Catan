@@ -35,39 +35,66 @@ public class Vertex {
 
 	/**
 	 * 
-	 * @return an int array containing the position of this {@link Vertex} {row, col}
+	 * @return an int array containing the position of this {@link Vertex} {row,
+	 *         col}
+	 * @throws VertexNotInitializedException
+	 *             if this {@link Vertex} has not been initialized
 	 */
-	public int[] getPosition() {
-		return new int[] {m_row, m_column};
+	public int[] getPosition() throws VertexNotInitializedException {
+		if (m_row == -1 || m_column == -1) {
+			throw new VertexNotInitializedException();
+		}
+		return new int[] { m_row, m_column };
 	}
-	
+
 	/**
 	 * 
 	 * @return an array of {@link Tile}s surrounding this {@link Vertex}
-	 * @throws BoardNotInitializedException if {@link Board} provided has not been initialized
-	 * @throws TileNotInitializedException if a {@link Tile} has not been initialized
+	 * @throws BoardNotInitializedException
+	 *             if {@link Board} provided has not been initialized
+	 * @throws TileNotInitializedException
+	 *             if a {@link Tile} has not been initialized
+	 * @throws VertexNotInitializedException
+	 *             if this {@link Vertex} has not been initialized
 	 */
-	public Tile[] getAdjacentTiles() throws TileNotInitializedException, BoardNotInitializedException {
+	public Tile[] getAdjacentTiles()
+			throws TileNotInitializedException, BoardNotInitializedException, VertexNotInitializedException {
+		if (m_row == -1 || m_column == -1) {
+			throw new VertexNotInitializedException();
+		}
 		ArrayList<Tile> tiles = new ArrayList<Tile>();
 		try {
 			tiles.add(m_board.getTileAt(m_row, m_column));
-		} catch (ArrayIndexOutOfBoundsException e) {	
+		} catch (ArrayIndexOutOfBoundsException e) {
 		}
 		try {
 			tiles.add(m_board.getTileAt(m_row - 1, m_column));
-		} catch (ArrayIndexOutOfBoundsException e) {	
+		} catch (ArrayIndexOutOfBoundsException e) {
 		}
 		try {
 			tiles.add(m_board.getTileAt(m_row, m_column - 1));
-		} catch (ArrayIndexOutOfBoundsException e) {	
+		} catch (ArrayIndexOutOfBoundsException e) {
 		}
 		try {
 			tiles.add(m_board.getTileAt(m_row - 1, m_column - 1));
-		} catch (ArrayIndexOutOfBoundsException e) {	
+		} catch (ArrayIndexOutOfBoundsException e) {
 		}
 		Tile[] output = new Tile[tiles.size()];
 		output = tiles.toArray(output);
 		return output;
+	}
+
+	/**
+	 * 
+	 * @return the {@link Board} this {@link Vertex} is on
+	 */
+	public Board getBoard() {
+		return m_board;
+	}
+
+	@Override
+	public String toString() {
+		return "Vertex: (" + m_row + ", " + m_column + ", " + m_board + ")";
 	}
 
 }

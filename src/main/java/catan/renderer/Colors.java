@@ -17,5 +17,25 @@ public class Colors {
 
 	public static final Color BOARD_EMPTY_COLOR = Color.BLUE;
 	
-	public static final Color BOARD_GRID_COLO = Color.GRAY;
+	public static final Color BOARD_GRID_COLOR = Color.GRAY;
+	
+	public static final Color BOARD_SELECTED_COLOR = Color.YELLOW;
+	
+	public static final Color OCEAN_COLOR = Color.BLUE;
+	
+	public static final Color COAST_COLOR = Color.YELLOW;
+	
+	public static final Color FOREST_COLOR = Color.GREEN;
+	
+	public static final Color PASTURE_COLOR = Color.CYAN;
+	
+	public static final Color FIELD_COLOR = Color.ORANGE;
+	
+	public static final Color QUARRY_COLOR = Color.LIGHT_GRAY;
+	
+	public static final Color CLAY_COLOR = Color.RED;
+	
+	public static final Color DESERT_COLOR = Color.BLACK;
+	
+	public static final Color FREQUENCY_COLOR = Color.WHITE;
 }

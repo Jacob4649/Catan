@@ -127,7 +127,8 @@ public class IO {
 	}
 
 	/**
-	 * Writes a {@link Board} to a {@link File} with the default board file name
+	 * Writes a {@link Board} to a {@link File} with the default {@link Board}
+	 * file name
 	 * 
 	 * @param board
 	 *            the {@link Board} to save
@@ -146,7 +147,18 @@ public class IO {
 	 * @return a fileName for the ith layout {@link File}
 	 */
 	private static String getFileName(int i) {
-		return System.getProperty("user.dir") + "/" + BOARD_DIRECTORY + BOARD_NAME + (i != 0 ? "_" + i : "") + BOARD_EXTENSION;
+		return System.getProperty("user.dir") + "/" + BOARD_DIRECTORY + BOARD_NAME + (i != 0 ? "_" + i : "")
+				+ BOARD_EXTENSION;
+	}
+
+	/**
+	 * 
+	 * @param name
+	 *            a file name for this {@link Board}
+	 * @return a {@link File} for this {@link Board} to be saved in
+	 */
+	public static File toBoardFile(String name) {
+		return new File(System.getProperty("user.dir") + "/" + BOARD_DIRECTORY + name + BOARD_EXTENSION);
 	}
 
 }
