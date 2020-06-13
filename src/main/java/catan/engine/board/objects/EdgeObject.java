@@ -33,11 +33,15 @@ public abstract class EdgeObject extends BoardObject<Edge> {
 	 *            the static base {@link BufferedImage} for this
 	 *            {@link EdgeObejct}, provided in vertical orientation assuming
 	 *            it will be placed on a vertical {@link Edge}
+	 * @param ignoreLocation
+	 *            if true, don't throw {@link InvalidLocationException} on
+	 *            invalid locations
 	 * @throws InvalidLocationException
 	 *             if initialized in an invalid location
 	 */
-	public EdgeObject(Player owner, Edge position, BufferedImage baseImage) throws InvalidLocationException {
-		super(position, baseImage);
+	public EdgeObject(Player owner, Edge position, BufferedImage baseImage, boolean ignoreLocation)
+			throws InvalidLocationException {
+		super(position, baseImage, ignoreLocation);
 		m_owner = owner;
 	}
 
@@ -48,7 +52,7 @@ public abstract class EdgeObject extends BoardObject<Edge> {
 	public Player getOwner() {
 		return m_owner;
 	}
-	
+
 	/**
 	 * 
 	 * @param mapDimensions

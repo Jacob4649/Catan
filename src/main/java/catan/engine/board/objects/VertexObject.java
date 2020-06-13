@@ -30,11 +30,15 @@ public abstract class VertexObject extends BoardObject<Vertex> {
 	 * @param baseImage
 	 *            the static base {@link BufferedImage} for this
 	 *            {@link VertexObejct}
+	 * @param ignoreLocation
+	 *            if true, don't throw {@link InvalidLocationException} on
+	 *            invalid locations
 	 * @throws InvalidLocationException
 	 *             if initialized in an invalid location
 	 */
-	public VertexObject(Player owner, Vertex position, BufferedImage baseImage) throws InvalidLocationException {
-		super(position, baseImage);
+	public VertexObject(Player owner, Vertex position, BufferedImage baseImage, boolean ignoreLocation)
+			throws InvalidLocationException {
+		super(position, baseImage, ignoreLocation);
 		m_owner = owner;
 	}
 
@@ -46,11 +50,15 @@ public abstract class VertexObject extends BoardObject<Vertex> {
 	 * @param baseImage
 	 *            the static base {@link BufferedImage} for this
 	 *            {@link VertexObejct}
+	 * @param ignoreLocation
+	 *            if true, don't throw {@link InvalidLocationException} on
+	 *            invalid locations
 	 * @throws InvalidLocationException
 	 *             if initialized in an invalid location
 	 */
-	public VertexObject(Vertex position, BufferedImage baseImage) throws InvalidLocationException {
-		this(null, position, baseImage);
+	public VertexObject(Vertex position, BufferedImage baseImage, boolean ignoreLocation)
+			throws InvalidLocationException {
+		this(null, position, baseImage, ignoreLocation);
 	}
 
 	/**

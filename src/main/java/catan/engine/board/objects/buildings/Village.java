@@ -37,10 +37,13 @@ public class Village extends VertexObject implements Productive {
 	 *            the {@link Player} owning the village
 	 * @param position
 	 *            the {@link Vertex} where the village is positioned
+	 * @param ignoreLocation
+	 *            if true, don't throw {@link InvalidLocationException} on
+	 *            invalid locations
 	 * @throws InvalidLocationException
 	 *             if initialized in an invalid location
 	 */
-	public Village(Player owner, Vertex position) throws InvalidLocationException {
+	public Village(Player owner, Vertex position, boolean ignoreLocation) throws InvalidLocationException {
 		super(owner, position, new BufferedImage(
 				(int) (0.4 * ((double) BoardPanel.PANEL_HORIZONTAL) / ((double) Board.DEFAULT_BOARD_DIMENSIONS[1])),
 				(int) (0.4 * ((double) BoardPanel.PANEL_VERTICAL) / ((double) Board.DEFAULT_BOARD_DIMENSIONS[0])),
@@ -50,7 +53,21 @@ public class Village extends VertexObject implements Productive {
 				g2D.setColor(new Color(155, 155, 155));
 				g2D.fillRect(0, 0, getWidth(), getHeight());
 			}
-		});
+		}, ignoreLocation);
+	}
+	
+	/**
+	 * Creates a {@link Village}
+	 * 
+	 * @param owner
+	 *            the {@link Player} owning the village
+	 * @param position
+	 *            the {@link Vertex} where the village is positioned
+	 * @throws InvalidLocationException
+	 *             if initialized in an invalid location
+	 */
+	public Village(Player owner, Vertex position) throws InvalidLocationException {
+		this(owner, position, false);
 	}
 
 	/**

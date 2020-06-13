@@ -32,12 +32,16 @@ public abstract class BoardObject<T> {
 	 * @param baseImage
 	 *            the base {@link BufferedImage} to be scaled and displayed for
 	 *            this {@link BoardObject}
-	 * @throws InvalidLocationException if initialized in an invalid location
+	 * @param ignoreLocation
+	 *            if true, don't throw {@link InvalidLocationException} on
+	 *            invalid locations
+	 * @throws InvalidLocationException
+	 *             if initialized in an invalid location
 	 */
-	public BoardObject(T position, BufferedImage baseImage) throws InvalidLocationException {
+	public BoardObject(T position, BufferedImage baseImage, boolean ignoreLocation) throws InvalidLocationException {
 		m_position = position;
 		m_baseImages.addImage(baseImage, getClass());
-		if (!validLocation()) {
+		if (!validLocation() && !ignoreLocation) {
 			throw new InvalidLocationException();
 		}
 	}
@@ -93,7 +97,8 @@ public abstract class BoardObject<T> {
 			m_image = m_baseImages.getImageMatching(getClass());
 		} else {
 			int[] dimensions = getImageDimensions(mapDimensions, panelDimensions);
-			Image image = m_baseImages.getImageMatching(getClass()).getScaledInstance(dimensions[0], dimensions[1], Image.SCALE_SMOOTH);
+			Image image = m_baseImages.getImageMatching(getClass()).getScaledInstance(dimensions[0], dimensions[1],
+					Image.SCALE_SMOOTH);
 			BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null),
 					BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g2D = bufferedImage.createGraphics();
@@ -118,8 +123,8 @@ public abstract class BoardObject<T> {
 
 	/**
 	 * 
-	 * @return a {@link T} containing the position of this {@link BoardObject} {row,
-	 *         col}
+	 * @return a {@link T} containing the position of this {@link BoardObject}
+	 *         {row, col}
 	 * @throws BoardObjectNotInitializedException
 	 *             if this {@link BoardObject} has not been initialized
 	 */
@@ -132,12 +137,13 @@ public abstract class BoardObject<T> {
 
 	/**
 	 * Determines whether this {@link BoardObject} is in a valid {@link T}
+	 * 
 	 * @return true if this {@link BoardObject} is in a valid {@link T}
 	 */
 	public boolean validLocation() {
 		return true;
 	}
-	
+
 	/**
 	 * 
 	 * @param mapDimensions

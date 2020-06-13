@@ -156,7 +156,7 @@ public class Catan {
 
 		catan.getBoard().addObject(new Village(catan.getPlayer(), catan.getBoard().getVertex(5, 5)));
 		catan.getBoard().addObject(
-				new Road(catan.getPlayer(), catan.getBoard().getEdge(new int[] { 1, 1 }, new int[] { 2, 1 })));
+				new Road(catan.getPlayer(), catan.getBoard().getEdge(new int[] { 1, 1 }, new int[] { 2, 1 }), true));
 
 		JFrame frame = new JFrame("Catan");
 

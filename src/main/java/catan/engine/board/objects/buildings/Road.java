@@ -30,10 +30,13 @@ public class Road extends EdgeObject {
 	 *            the {@link Player} owning the {@link Road}
 	 * @param position
 	 *            the {@link Edge} this {@link Road} is on
+	 * @param ignoreLocation
+	 *            if true, don't throw {@link InvalidLocationException} on
+	 *            invalid locations
 	 * @throws InvalidLocationException
 	 *             if initialized in an invalid location
 	 */
-	public Road(Player owner, Edge position) throws InvalidLocationException {
+	public Road(Player owner, Edge position, boolean ignoreLocation) throws InvalidLocationException {
 		super(owner, position, new BufferedImage(
 				(int) (0.1 * ((double) BoardPanel.PANEL_HORIZONTAL) / ((double) Board.DEFAULT_BOARD_DIMENSIONS[1])),
 				(int) (0.5 * ((double) BoardPanel.PANEL_VERTICAL) / ((double) Board.DEFAULT_BOARD_DIMENSIONS[0])),
@@ -43,7 +46,21 @@ public class Road extends EdgeObject {
 				g2D.setColor(new Color(155, 155, 155));
 				g2D.fillRect(0, 0, getWidth(), getHeight());
 			}
-		});
+		}, ignoreLocation);
+	}
+	
+	/**
+	 * Creates a new {@link Road}
+	 * 
+	 * @param owner
+	 *            the {@link Player} owning the {@link Road}
+	 * @param position
+	 *            the {@link Edge} this {@link Road} is on
+	 * @throws InvalidLocationException
+	 *             if initialized in an invalid location
+	 */
+	public Road(Player owner, Edge position) throws InvalidLocationException {
+		this(owner, position, false);
 	}
 
 	/**
@@ -58,8 +75,8 @@ public class Road extends EdgeObject {
 			for (Vertex vertex : endPoints) {
 				if (getPosition().getBoard().getAllObjectsMatching((object) -> {
 					try {
-						return object instanceof Road && object != this
-								&& ((Road) object).getOwner() == getOwner() && (((Road) object).getPosition().getEndPoints()[0].isAdjacent(vertex)
+						return object instanceof Road && object != this && ((Road) object).getOwner() == getOwner()
+								&& (((Road) object).getPosition().getEndPoints()[0].isAdjacent(vertex)
 										|| ((Road) object).getPosition().getEndPoints()[1].isAdjacent(vertex));
 					} catch (VertexNotInitializedException | EdgeNotInitializedException
 							| BoardObjectNotInitializedException e) {

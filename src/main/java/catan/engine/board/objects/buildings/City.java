@@ -37,10 +37,13 @@ public class City extends VertexObject implements Productive {
 	 *            the {@link Player} owning the city
 	 * @param position
 	 *            the {@link Vertex} where the city is positioned
+	 * @param ignoreLocation
+	 *            if true, don't throw {@link InvalidLocationException} on
+	 *            invalid locations
 	 * @throws InvalidLocationException
 	 *             if initialized in an invalid location
 	 */
-	public City(Player owner, Vertex position) throws InvalidLocationException {
+	public City(Player owner, Vertex position, boolean ignoreLocation) throws InvalidLocationException {
 		super(owner, position, new BufferedImage(
 				(int) (0.6 * ((double) BoardPanel.PANEL_HORIZONTAL) / ((double) Board.DEFAULT_BOARD_DIMENSIONS[1])),
 				(int) (0.6 * ((double) BoardPanel.PANEL_VERTICAL) / ((double) Board.DEFAULT_BOARD_DIMENSIONS[0])),
@@ -50,7 +53,21 @@ public class City extends VertexObject implements Productive {
 				g2D.setColor(new Color(155, 155, 155));
 				g2D.fillRect(0, 0, getWidth(), getHeight());
 			}
-		});
+		}, ignoreLocation);
+	}
+	
+	/**
+	 * Creates a {@link City}
+	 * 
+	 * @param owner
+	 *            the {@link Player} owning the city
+	 * @param position
+	 *            the {@link Vertex} where the city is positioned
+	 * @throws InvalidLocationException
+	 *             if initialized in an invalid location
+	 */
+	public City(Player owner, Vertex position) throws InvalidLocationException {
+		this(owner, position, false);
 	}
 
 	/**
