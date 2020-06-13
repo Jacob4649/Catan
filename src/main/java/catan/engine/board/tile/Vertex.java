@@ -1,12 +1,13 @@
 package catan.engine.board.tile;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import catan.engine.board.Board;
 import catan.engine.board.BoardNotInitializedException;
 
 /**
- * Class representing a vertex on the Catan board
+ * Class representing a vertex on the {@link Catan} {@link Board}
  * 
  * @author Jacob
  *
@@ -85,6 +86,19 @@ public class Vertex {
 	}
 
 	/**
+	 * Determines whether this {@link Vertex} is adjacent to the specified
+	 * {@link Vertex}
+	 * 
+	 * @param vertex
+	 *            the {@link Vertex} to determine for
+	 * @return true if adjacent
+	 */
+	public boolean isAdjacent(Vertex vertex) throws VertexNotInitializedException {
+		return Math.abs(getPosition()[0] - vertex.getPosition()[0])
+				+ Math.abs(getPosition()[1] - vertex.getPosition()[1]) == 1;
+	}
+
+	/**
 	 * 
 	 * @return the {@link Board} this {@link Vertex} is on
 	 */
@@ -92,9 +106,32 @@ public class Vertex {
 		return m_board;
 	}
 
+	/**
+	 * 
+	 * @param vertex
+	 *            the {@link Vertex} to get distance from
+	 * @return int array containing a vector going from this {@link Vertex} to
+	 *         the specified {@link Vertex} {x/col, y/row}
+	 * @throws VertexNotInitializedException
+	 *             if either {@link Vertex} has not been initialized
+	 */
+	public int[] getDistanceFrom(Vertex vertex) throws VertexNotInitializedException {
+		return new int[] { vertex.getPosition()[1] - getPosition()[1], vertex.getPosition()[0] - getPosition()[0] };
+	}
+
 	@Override
 	public String toString() {
 		return "Vertex: (" + m_row + ", " + m_column + ", " + m_board + ")";
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		try {
+			return object instanceof Vertex && ((Vertex) object).getBoard() == getBoard()
+					&& Arrays.equals(((Vertex) object).getPosition(), getPosition());
+		} catch (VertexNotInitializedException e) {
+			return object instanceof Vertex && ((Vertex) object).getBoard() == getBoard();
+		}
 	}
 
 }

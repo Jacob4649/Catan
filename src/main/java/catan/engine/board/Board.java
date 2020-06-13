@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import catan.Catan;
 import catan.engine.board.objects.BoardObject;
 import catan.engine.board.objects.BoardObjectMatcher;
+import catan.engine.board.tile.Edge;
 import catan.engine.board.tile.Tile;
 import catan.engine.board.tile.TileNotInitializedException;
 import catan.engine.board.tile.TileType;
@@ -254,8 +255,22 @@ public class Board {
 	}
 
 	/**
+	 * 
+	 * @param point1
+	 *            the first point the {@link Edge} is on {row, col}
+	 * @param point2
+	 *            the second point the {@link Edge} is on {row, col}
+	 * @return a {@link Edge} between these two points on this {@link Board}
+	 */
+	public Edge getEdge(int[] point1, int[] point2) {
+		return new Edge(point1, point2, this);
+	}
+
+	/**
 	 * Gets all {@link BoardObject} matching a set condition
-	 * @param matcher a {@link BoardMatcher} containing the condition
+	 * 
+	 * @param matcher
+	 *            a {@link BoardMatcher} containing the condition
 	 * @return array containing all matching {@link BoardObject}s
 	 */
 	public BoardObject[] getAllObjectsMatching(BoardObjectMatcher matcher) {
@@ -269,7 +284,7 @@ public class Board {
 		output = objects.toArray(output);
 		return output;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Board";

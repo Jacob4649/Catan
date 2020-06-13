@@ -20,7 +20,7 @@ import catan.renderer.panel.BoardPanel;
  */
 public abstract class BoardObject<T> {
 
-	private static BufferedImage m_baseImage;
+	private static ObjectImageCollection m_baseImages = new ObjectImageCollection();
 	protected BufferedImage m_image;
 	private T m_position;
 
@@ -32,10 +32,14 @@ public abstract class BoardObject<T> {
 	 * @param baseImage
 	 *            the base {@link BufferedImage} to be scaled and displayed for
 	 *            this {@link BoardObject}
+	 * @throws InvalidLocationException if initialized in an invalid location
 	 */
-	public BoardObject(T position, BufferedImage baseImage) {
+	public BoardObject(T position, BufferedImage baseImage) throws InvalidLocationException {
 		m_position = position;
-		m_baseImage = baseImage;
+		m_baseImages.addImage(baseImage, getClass());
+		if (!validLocation()) {
+			throw new InvalidLocationException();
+		}
 	}
 
 	/**
@@ -82,14 +86,14 @@ public abstract class BoardObject<T> {
 	 */
 	public BufferedImage getImage(int[] mapDimensions, int[] panelDimensions)
 			throws BoardObjectNotInitializedException {
-		if (m_baseImage == null) {
+		if (m_baseImages.getImageMatching(getClass()) == null) {
 			throw new BoardObjectNotInitializedException();
 		}
 		if (mapDimensions == null || panelDimensions == null) {
-			m_image = m_baseImage;
+			m_image = m_baseImages.getImageMatching(getClass());
 		} else {
 			int[] dimensions = getImageDimensions(mapDimensions, panelDimensions);
-			Image image = m_baseImage.getScaledInstance(dimensions[0], dimensions[1], Image.SCALE_SMOOTH);
+			Image image = m_baseImages.getImageMatching(getClass()).getScaledInstance(dimensions[0], dimensions[1], Image.SCALE_SMOOTH);
 			BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null),
 					BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g2D = bufferedImage.createGraphics();
@@ -114,7 +118,7 @@ public abstract class BoardObject<T> {
 
 	/**
 	 * 
-	 * @return a T containing the position of this {@link BoardObject} {row,
+	 * @return a {@link T} containing the position of this {@link BoardObject} {row,
 	 *         col}
 	 * @throws BoardObjectNotInitializedException
 	 *             if this {@link BoardObject} has not been initialized
@@ -126,6 +130,14 @@ public abstract class BoardObject<T> {
 		return m_position;
 	}
 
+	/**
+	 * Determines whether this {@link BoardObject} is in a valid {@link T}
+	 * @return true if this {@link BoardObject} is in a valid {@link T}
+	 */
+	public boolean validLocation() {
+		return true;
+	}
+	
 	/**
 	 * 
 	 * @param mapDimensions

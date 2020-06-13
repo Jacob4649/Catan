@@ -49,6 +49,7 @@ public class BoardPanel extends JPanel {
 	private boolean m_mouseLock = false;
 	private boolean m_preSelectionIndicator = false;
 	private boolean m_selectVertex = false;
+	private boolean m_selectObjects = false;
 	private int[] m_selected;
 	private BoardObject m_selectedObject;
 	private SelectedPositionListener m_selectedTileListener;
@@ -69,17 +70,16 @@ public class BoardPanel extends JPanel {
 		setBorder(BorderFactory.createLineBorder(Colors.BOARD_BORDER_COLOR));
 		setBackground(Colors.BOARD_EMPTY_COLOR);
 
-		//Deselect keybinding
-		getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                "deselect");
+		// Deselect keybinding
+		getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "deselect");
 		getActionMap().put("deselect", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				m_selected = null;
 			}
 		});
-		
-		//mouse listener
+
+		// mouse listener
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent event) {
@@ -91,25 +91,27 @@ public class BoardPanel extends JPanel {
 						m_selectedObject = null;
 
 						// check selected objects
-						for (BoardObject object : m_board.getObjects()) {
-							try {
-								int[] firstCorner = object.getImagePosition(m_board.getDimensions(),
-										new int[] { getWidth(), getHeight() });
-								int[] dimensions = object.getImageDimensions(m_board.getDimensions(),
-										new int[] { getWidth(), getHeight() });
-								if (event.getX() > firstCorner[0] && event.getX() < firstCorner[0] + dimensions[0]
-										&& event.getY() > firstCorner[1]
-										&& event.getY() < firstCorner[1] + dimensions[1]) {
-									m_selectedObject = object;
-									if (m_selectedObjectListener != null) {
-										m_selectedObjectListener.onSelect(m_selectedObject);
+						if (m_selectObjects) {
+							for (BoardObject object : m_board.getObjects()) {
+								try {
+									int[] firstCorner = object.getImagePosition(m_board.getDimensions(),
+											new int[] { getWidth(), getHeight() });
+									int[] dimensions = object.getImageDimensions(m_board.getDimensions(),
+											new int[] { getWidth(), getHeight() });
+									if (event.getX() > firstCorner[0] && event.getX() < firstCorner[0] + dimensions[0]
+											&& event.getY() > firstCorner[1]
+											&& event.getY() < firstCorner[1] + dimensions[1]) {
+										m_selectedObject = object;
+										if (m_selectedObjectListener != null) {
+											m_selectedObjectListener.onSelect(m_selectedObject);
+										}
+										m_mouseLock = false;
+										return;
 									}
-									m_mouseLock = false;
-									return;
+								} catch (BoardObjectNotInitializedException | BoardNotInitializedException e) {
+									e.printStackTrace();
+									System.exit(0);
 								}
-							} catch (BoardObjectNotInitializedException | BoardNotInitializedException e) {
-								e.printStackTrace();
-								System.exit(0);
 							}
 						}
 
@@ -125,7 +127,7 @@ public class BoardPanel extends JPanel {
 								m_selected = pixelToPos(event.getX(), event.getY());
 								if (m_selectedTileListener != null) {
 									m_selectedTileListener.onSelect(m_selected[0], m_selected[1]);
-								}	
+								}
 							}
 						} catch (BoardNotInitializedException | TileNotInitializedException e) {
 							e.printStackTrace();
@@ -202,16 +204,18 @@ public class BoardPanel extends JPanel {
 						new int[] { getWidth(), getHeight() });
 				if (m_selectVertex) {
 					g2D.drawRect(
-							(int) ((((double) m_selected[1] / (double) m_board.getDimensions()[1]) * (double) getWidth())
+							(int) ((((double) m_selected[1] / (double) m_board.getDimensions()[1])
+									* (double) getWidth())
 									- (VERTEX_INDICATOR_RELATIVE_SIZE * ((double) (tileDimensions[0]) / 2d))),
-							(int) ((((double) m_selected[0] / (double) m_board.getDimensions()[0]) * (double) getHeight())
+							(int) ((((double) m_selected[0] / (double) m_board.getDimensions()[0])
+									* (double) getHeight())
 									- (VERTEX_INDICATOR_RELATIVE_SIZE * ((double) (tileDimensions[1])) / 2d)),
 							(int) (VERTEX_INDICATOR_RELATIVE_SIZE * ((double) (tileDimensions[0]))),
 							(int) (VERTEX_INDICATOR_RELATIVE_SIZE * ((double) (tileDimensions[1]))));
 				} else {
 					g2D.drawRect((int) (((float) m_selected[1] / (float) m_board.getDimensions()[1]) * getWidth()),
 							(int) (((float) m_selected[0] / (float) m_board.getDimensions()[0]) * getHeight()),
-							tileDimensions[0], tileDimensions[1]);	
+							tileDimensions[0], tileDimensions[1]);
 				}
 			}
 
@@ -266,8 +270,8 @@ public class BoardPanel extends JPanel {
 					if (tilePos[0] >= 0 && tilePos[0] < dimensions[0] && tilePos[1] >= 0
 							&& tilePos[1] < dimensions[1]) {
 						g2D.drawRect((int) (((float) tilePos[1] / (float) dimensions[1]) * getWidth()),
-								(int) (((float) tilePos[0] / (float) dimensions[0]) * getHeight()),
-								tileDimensions[0], tileDimensions[1]);
+								(int) (((float) tilePos[0] / (float) dimensions[0]) * getHeight()), tileDimensions[0],
+								tileDimensions[1]);
 					}
 				}
 			}
@@ -369,13 +373,31 @@ public class BoardPanel extends JPanel {
 	}
 
 	/**
+	 * Set whether {@link BoardObject} should be selectable
+	 * 
+	 * @param select
+	 *            true if they should be selectable
+	 */
+	public void setSelectObject(boolean select) {
+		m_selectObjects = select;
+	}
+	
+	/**
+	 * Sets the selected object
+	 * @param object the {@link BoardObject} to select
+	 */
+	public void setSelectedObject(BoardObject object) {
+		m_selectedObject = object;
+	}
+
+	/**
 	 * 
 	 * @return the {@link Board} being used by this {@link BoardPanel}
 	 */
 	public Board getBoard() {
 		return m_board;
 	}
-	
+
 	/**
 	 * Converts an index of a horizontal {@link Tile} on the board to a point
 	 * 

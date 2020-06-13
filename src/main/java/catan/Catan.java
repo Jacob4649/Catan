@@ -8,7 +8,10 @@ import javax.swing.JFrame;
 
 import catan.engine.board.Board;
 import catan.engine.board.BoardNotInitializedException;
+import catan.engine.board.objects.BoardObject;
 import catan.engine.board.objects.BoardObjectNotInitializedException;
+import catan.engine.board.objects.InvalidLocationException;
+import catan.engine.board.objects.buildings.Road;
 import catan.engine.board.objects.buildings.Village;
 import catan.engine.player.Player;
 import catan.engine.player.PlayerColor;
@@ -111,7 +114,7 @@ public class Catan {
 	public Player[] getPlayers() {
 		return m_players;
 	}
-	
+
 	/**
 	 * 
 	 * @return the user's {@link Player}
@@ -143,8 +146,8 @@ public class Catan {
 		m_board = board;
 	}
 
-	public static void main(String[] args)
-			throws PlayerCountOutOfBoundsException, PlayerIndexOutOfBoundsException, BoardNotInitializedException, BoardObjectNotInitializedException {
+	public static void main(String[] args) throws PlayerCountOutOfBoundsException, PlayerIndexOutOfBoundsException,
+			BoardNotInitializedException, BoardObjectNotInitializedException, InvalidLocationException {
 
 		// start catan game
 		Catan catan = new Catan();
@@ -152,15 +155,42 @@ public class Catan {
 		catan.setBoard(Board.randomLandBoard());
 
 		catan.getBoard().addObject(new Village(catan.getPlayer(), catan.getBoard().getVertex(5, 5)));
-		
+		catan.getBoard().addObject(
+				new Road(catan.getPlayer(), catan.getBoard().getEdge(new int[] { 1, 1 }, new int[] { 2, 1 })));
+
 		JFrame frame = new JFrame("Catan");
 
-		frame.getContentPane().add(new BoardPanel(catan.getBoard()){
+		frame.getContentPane().add(new BoardPanel(catan.getBoard()) {
 			{
 				setPreSelection(true);
 				setSelectVertex(true);
+				setSelectObject(true);
+				setOnObjectSelectedListener((object) -> {
+					if (object instanceof Village) {
+						try {
+							setSelectedObject(((Village) object).upgrade());
+						} catch (InvalidLocationException e) {
+							e.printStackTrace();
+							System.exit(0);
+						}
+					}
+				});
 				setOnVertexSelectedListener((row, col) -> {
-					getBoard().addObject(new Village(catan.getPlayer(), getBoard().getVertex(row, col)));
+					try {
+						BoardObject[] objects = getBoard().getAllObjectsMatching((object) -> {
+							try {
+								return object.getPosition().equals(getBoard().getVertex(row, col));
+							} catch (BoardObjectNotInitializedException e) {
+								e.printStackTrace();
+								System.exit(0);
+								return false;
+							}
+						});
+						if (objects.length == 0) {
+							getBoard().addObject(new Village(catan.getPlayer(), getBoard().getVertex(row, col)));
+						}
+					} catch (InvalidLocationException e) {
+					}
 				});
 			}
 		});

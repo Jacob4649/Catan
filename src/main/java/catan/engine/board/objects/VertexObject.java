@@ -24,14 +24,16 @@ public abstract class VertexObject extends BoardObject<Vertex> {
 	 * Creates a new {@link VertexObject}
 	 * 
 	 * @param owner
-	 *            the owner of this {@link BoardObject}
+	 *            the owner of this {@link VertexObject}
 	 * @param position
 	 *            the {@link Vertex} this {@link VertexObject} is on
 	 * @param baseImage
 	 *            the static base {@link BufferedImage} for this
 	 *            {@link VertexObejct}
+	 * @throws InvalidLocationException
+	 *             if initialized in an invalid location
 	 */
-	public VertexObject(Player owner, Vertex position, BufferedImage baseImage) {
+	public VertexObject(Player owner, Vertex position, BufferedImage baseImage) throws InvalidLocationException {
 		super(position, baseImage);
 		m_owner = owner;
 	}
@@ -44,11 +46,13 @@ public abstract class VertexObject extends BoardObject<Vertex> {
 	 * @param baseImage
 	 *            the static base {@link BufferedImage} for this
 	 *            {@link VertexObejct}
+	 * @throws InvalidLocationException
+	 *             if initialized in an invalid location
 	 */
-	public VertexObject(Vertex position, BufferedImage baseImage) {
+	public VertexObject(Vertex position, BufferedImage baseImage) throws InvalidLocationException {
 		this(null, position, baseImage);
 	}
-	
+
 	/**
 	 * 
 	 * @return the {@link Player} owning this {@link VertexObject}
@@ -83,7 +87,7 @@ public abstract class VertexObject extends BoardObject<Vertex> {
 		} catch (VertexNotInitializedException e) {
 			e.printStackTrace();
 			System.exit(0);
-			return new int[] {0, 0};
+			return new int[] { 0, 0 };
 		}
 	}
 
@@ -126,5 +130,5 @@ public abstract class VertexObject extends BoardObject<Vertex> {
 			return "Vertex Object: (Not Initialized)";
 		}
 	}
-	
+
 }

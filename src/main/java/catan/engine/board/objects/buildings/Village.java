@@ -8,6 +8,7 @@ import catan.engine.board.Board;
 import catan.engine.board.BoardNotInitializedException;
 import catan.engine.board.objects.BoardObject;
 import catan.engine.board.objects.BoardObjectNotInitializedException;
+import catan.engine.board.objects.InvalidLocationException;
 import catan.engine.board.objects.NoOwnerException;
 import catan.engine.board.objects.Productive;
 import catan.engine.board.objects.VertexObject;
@@ -28,7 +29,7 @@ import catan.renderer.panel.BoardPanel;
 public class Village extends VertexObject implements Productive {
 
 	private static final int VILLAGE_PRODUCTIVITY = 1;
-	
+
 	/**
 	 * Creates a {@link Village}
 	 * 
@@ -36,8 +37,10 @@ public class Village extends VertexObject implements Productive {
 	 *            the {@link Player} owning the village
 	 * @param position
 	 *            the {@link Vertex} where the village is positioned
+	 * @throws InvalidLocationException
+	 *             if initialized in an invalid location
 	 */
-	public Village(Player owner, Vertex position) {
+	public Village(Player owner, Vertex position) throws InvalidLocationException {
 		super(owner, position, new BufferedImage(
 				(int) (0.4 * ((double) BoardPanel.PANEL_HORIZONTAL) / ((double) Board.DEFAULT_BOARD_DIMENSIONS[1])),
 				(int) (0.4 * ((double) BoardPanel.PANEL_VERTICAL) / ((double) Board.DEFAULT_BOARD_DIMENSIONS[0])),
@@ -56,8 +59,10 @@ public class Village extends VertexObject implements Productive {
 	 * @return the new {@link City}
 	 * @throws BoardObjectNotInitializedException
 	 *             if this {@link BoardObject} is not initialized
+	 * @throws InvalidLocationException
+	 *             if created in an invalid location
 	 */
-	public City upgrade() throws BoardObjectNotInitializedException {
+	public City upgrade() throws BoardObjectNotInitializedException, InvalidLocationException {
 		getPosition().getBoard().removeObject(this);
 		City city = new City(getOwner(), getPosition());
 		getPosition().getBoard().addObject(city);
@@ -65,23 +70,54 @@ public class Village extends VertexObject implements Productive {
 	}
 
 	/**
+	 * Determines whether this {@link Village} is in a valid location
+	 * 
+	 * @returns true if this {@link Village} is in a valid location
+	 */
+	@Override
+	public boolean validLocation() {
+		try {
+			return getPosition().getBoard().getAllObjectsMatching((object) -> {
+				try {
+					return (object instanceof Village || object instanceof City)
+							&& ((Vertex) object.getPosition()).isAdjacent(getPosition());
+				} catch (VertexNotInitializedException | BoardObjectNotInitializedException e) {
+					e.printStackTrace();
+					System.exit(0);
+					return false;
+				}
+			}).length == 0;
+		} catch (BoardObjectNotInitializedException e) {
+			e.printStackTrace();
+			System.exit(0);
+			return false;
+		}
+	}
+
+	/**
 	 * 
 	 * @return {@link ResourceBundle} containing all resources this
 	 *         {@link Village} produces in a turn
-	 * @throws BoardObjectNotInitializedException if this {@link BoardObject} has not been initialized
-	 * @throws VertexNotInitializedException if the {@link Vertex} this {@link Village} is on has not been initialized
-	 * @throws BoardNotInitializedException if the {@link Board} has not been initialized
-	 * @throws TileNotInitializedException if any {@link Tile}s have not been initialized
+	 * @throws BoardObjectNotInitializedException
+	 *             if this {@link BoardObject} has not been initialized
+	 * @throws VertexNotInitializedException
+	 *             if the {@link Vertex} this {@link Village} is on has not been
+	 *             initialized
+	 * @throws BoardNotInitializedException
+	 *             if the {@link Board} has not been initialized
+	 * @throws TileNotInitializedException
+	 *             if any {@link Tile}s have not been initialized
 	 */
 	@Override
-	public ResourceBundle getResources() throws TileNotInitializedException, BoardNotInitializedException, VertexNotInitializedException, BoardObjectNotInitializedException {
+	public ResourceBundle getResources() throws TileNotInitializedException, BoardNotInitializedException,
+			VertexNotInitializedException, BoardObjectNotInitializedException {
 		ResourceBundle bundle = new ResourceBundle();
 		for (Tile tile : getPosition().getAdjacentTiles()) {
 			bundle.add(tile.getResources(VILLAGE_PRODUCTIVITY));
 		}
 		return bundle;
 	}
-	
+
 	/**
 	 * Adds all resources produced by this {@link Village} to the owning
 	 * {@link Player}'s {@link ResourceBundle}
@@ -110,14 +146,14 @@ public class Village extends VertexObject implements Productive {
 	/**
 	 * 
 	 * @param mapDimensions
-	 *            the dimensions of the map this {@link BoardObject} is on in
-	 *            tiles {row, col}
+	 *            the dimensions of the map this {@link Village} is on in tiles
+	 *            {row, col}
 	 * @param panelDimensions
-	 *            the dimensions of the panel this {@link BoardObject} is on in
+	 *            the dimensions of the panel this {@link Village} is on in
 	 *            pixels {x, y}
 	 * @return an int array containing the dimensions of the
 	 *         {@link BufferedImage} that should be used to display this
-	 *         {@link BoardObject}
+	 *         {@link Village}
 	 */
 	@Override
 	public int[] getImageDimensions(int[] mapDimensions, int[] panelDimensions) {

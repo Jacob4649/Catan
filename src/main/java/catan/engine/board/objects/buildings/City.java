@@ -8,6 +8,7 @@ import catan.engine.board.Board;
 import catan.engine.board.BoardNotInitializedException;
 import catan.engine.board.objects.BoardObject;
 import catan.engine.board.objects.BoardObjectNotInitializedException;
+import catan.engine.board.objects.InvalidLocationException;
 import catan.engine.board.objects.NoOwnerException;
 import catan.engine.board.objects.Productive;
 import catan.engine.board.objects.VertexObject;
@@ -36,8 +37,10 @@ public class City extends VertexObject implements Productive {
 	 *            the {@link Player} owning the city
 	 * @param position
 	 *            the {@link Vertex} where the city is positioned
+	 * @throws InvalidLocationException
+	 *             if initialized in an invalid location
 	 */
-	public City(Player owner, Vertex position) {
+	public City(Player owner, Vertex position) throws InvalidLocationException {
 		super(owner, position, new BufferedImage(
 				(int) (0.6 * ((double) BoardPanel.PANEL_HORIZONTAL) / ((double) Board.DEFAULT_BOARD_DIMENSIONS[1])),
 				(int) (0.6 * ((double) BoardPanel.PANEL_VERTICAL) / ((double) Board.DEFAULT_BOARD_DIMENSIONS[0])),
@@ -48,6 +51,31 @@ public class City extends VertexObject implements Productive {
 				g2D.fillRect(0, 0, getWidth(), getHeight());
 			}
 		});
+	}
+
+	/**
+	 * Determines whether this {@link City} is in a valid location
+	 * 
+	 * @returns true if this {@link City} is in a valid location
+	 */
+	@Override
+	public boolean validLocation() {
+		try {
+			return getPosition().getBoard().getAllObjectsMatching((object) -> {
+				try {
+					return (object instanceof Village || object instanceof City)
+							&& ((Vertex) object.getPosition()).isAdjacent(getPosition());
+				} catch (VertexNotInitializedException | BoardObjectNotInitializedException e) {
+					e.printStackTrace();
+					System.exit(0);
+					return false;
+				}
+			}).length == 0;
+		} catch (BoardObjectNotInitializedException e) {
+			e.printStackTrace();
+			System.exit(0);
+			return false;
+		}
 	}
 
 	/**
@@ -102,14 +130,14 @@ public class City extends VertexObject implements Productive {
 	/**
 	 * 
 	 * @param mapDimensions
-	 *            the dimensions of the map this {@link BoardObject} is on in
-	 *            tiles {row, col}
+	 *            the dimensions of the map this {@link City} is on in tiles
+	 *            {row, col}
 	 * @param panelDimensions
-	 *            the dimensions of the panel this {@link BoardObject} is on in
-	 *            pixels {x, y}
+	 *            the dimensions of the panel this {@link City} is on in pixels
+	 *            {x, y}
 	 * @return an int array containing the dimensions of the
 	 *         {@link BufferedImage} that should be used to display this
-	 *         {@link BoardObject}
+	 *         {@link City}
 	 */
 	@Override
 	public int[] getImageDimensions(int[] mapDimensions, int[] panelDimensions) {
