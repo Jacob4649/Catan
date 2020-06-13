@@ -20,7 +20,7 @@ import catan.renderer.panel.BoardPanel;
  */
 public abstract class BoardObject<T> {
 
-	private static ObjectImageCollection m_baseImages = new ObjectImageCollection();
+	protected static ObjectImageCollection m_baseImages = new ObjectImageCollection();
 	protected BufferedImage m_image;
 	private T m_position;
 

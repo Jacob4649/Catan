@@ -2,6 +2,7 @@ package catan.engine.board.objects;
 
 import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -113,7 +114,33 @@ public abstract class EdgeObject extends BoardObject<Edge> {
 	@Override
 	public BufferedImage getImage(int[] mapDimensions, int[] panelDimensions)
 			throws BoardObjectNotInitializedException {
-		super.getImage(mapDimensions, panelDimensions);
+		if (m_baseImages.getImageMatching(getClass()) == null) {
+			throw new BoardObjectNotInitializedException();
+		}
+		if (mapDimensions == null || panelDimensions == null) {
+			m_image = m_baseImages.getImageMatching(getClass());
+		} else {
+			int[] dimensions = null;
+			try {
+				if (getPosition().isVertical()) {
+					dimensions = getImageDimensions(mapDimensions, panelDimensions);	
+				} else {
+					dimensions = new int[] {getImageDimensions(mapDimensions, panelDimensions)[1], getImageDimensions(mapDimensions, panelDimensions)[0]};
+				}
+			} catch (VertexNotInitializedException e) {
+				e.printStackTrace();
+				System.exit(0);
+				return null;
+			}
+			Image image = m_baseImages.getImageMatching(getClass()).getScaledInstance(dimensions[0], dimensions[1],
+					Image.SCALE_SMOOTH);
+			BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null),
+					BufferedImage.TYPE_INT_ARGB);
+			Graphics2D g2D = bufferedImage.createGraphics();
+			g2D.drawImage(image, 0, 0, null);
+			g2D.dispose();
+			m_image = bufferedImage;
+		}
 
 		// rotate image if needed
 		try {
