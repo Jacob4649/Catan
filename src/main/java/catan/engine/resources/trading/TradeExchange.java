@@ -2,6 +2,7 @@ package catan.engine.resources.trading;
 
 import catan.engine.player.Player;
 import catan.engine.resources.Purchase;
+import catan.engine.resources.PurchaseCosts;
 import catan.engine.resources.ResourceBundle;
 
 /**
@@ -12,9 +13,6 @@ import catan.engine.resources.ResourceBundle;
  *
  */
 public class TradeExchange implements Purchase {
-
-	private static final int INPUT_AMOUNT = 3;
-	private static final int OUTPUT_AMOUNT = 1;
 
 	private int m_input;
 	private int m_output;
@@ -39,7 +37,7 @@ public class TradeExchange implements Purchase {
 	@Override
 	public ResourceBundle getCost() {
 		int[] input = new int[] { 0, 0, 0, 0, 0 };
-		input[m_input] = INPUT_AMOUNT;
+		input[m_input] = PurchaseCosts.TRADEEXCHANGE_COST;
 		return new ResourceBundle(input);
 	}
 
@@ -66,7 +64,7 @@ public class TradeExchange implements Purchase {
 	@Override
 	public ResourceBundle getItem() {
 		int[] output = new int[] { 0, 0, 0, 0, 0 };
-		output[m_output] = OUTPUT_AMOUNT;
+		output[m_output] = PurchaseCosts.TRADEEXCHANGE_YIELD;
 		return new ResourceBundle(output);
 	}
 }
