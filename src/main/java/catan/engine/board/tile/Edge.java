@@ -1,7 +1,11 @@
 package catan.engine.board.tile;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import catan.Catan;
 import catan.engine.board.Board;
+import catan.engine.board.BoardNotInitializedException;
 
 /**
  * Class representing an edge between two {@link Tile}s on the {@link Catan}
@@ -71,6 +75,31 @@ public class Edge {
 
 	/**
 	 * 
+	 * @return array of all {@link Edge}s adjacent to this one
+	 * @throws BoardNotInitializedException
+	 *             if the {@link Board} hasn't been initialized
+	 * @throws VertexNotInitializedException
+	 *             if any {@link Vertex} hasn't been initialized
+	 * @throws EdgeNotInitializedException
+	 *             if the {@link Edge} hasn't been initialized
+	 */
+	public Edge[] getAdjacentEdges()
+			throws BoardNotInitializedException, VertexNotInitializedException, EdgeNotInitializedException {
+		ArrayList<Edge> edges = new ArrayList<Edge>();
+		for (Vertex vertex : getEndPoints()[0].getAdjacentVertices()) {
+			edges.add(new Edge(getEndPoints()[0].getPosition(), vertex.getPosition(), getBoard()));
+		}
+		for (Vertex vertex : getEndPoints()[1].getAdjacentVertices()) {
+			edges.add(new Edge(getEndPoints()[1].getPosition(), vertex.getPosition(), getBoard()));
+		}
+		edges.removeAll(Collections.singleton(this));
+		Edge[] output = new Edge[edges.size()];
+		output = edges.toArray(output);
+		return output;
+	}
+
+	/**
+	 * 
 	 * @return int array containing the distance between the two {@link Vertex}
 	 *         (vertices) of this {@link Edge} {x/col, y/row}
 	 * @throws VertexNotInitializedException
@@ -80,8 +109,22 @@ public class Edge {
 	}
 
 	@Override
+	public boolean equals(Object object) {
+		try {
+			return object instanceof Edge && ((((Edge) object).getEndPoints()[0].equals(getEndPoints()[0])
+					&& ((Edge) object).getEndPoints()[1].equals(getEndPoints()[1]))
+					|| (((Edge) object).getEndPoints()[0].equals(getEndPoints()[1])
+							&& ((Edge) object).getEndPoints()[1].equals(getEndPoints()[0])));
+		} catch (EdgeNotInitializedException e) {
+			e.printStackTrace();
+			System.exit(0);
+			return false;
+		}
+	}
+
+	@Override
 	public String toString() {
-		return "Edge Object: (" + m_vertex1 + ", " + m_vertex2 + ")";
+		return "Edge: (" + m_vertex1 + ", " + m_vertex2 + ")";
 	}
 
 }

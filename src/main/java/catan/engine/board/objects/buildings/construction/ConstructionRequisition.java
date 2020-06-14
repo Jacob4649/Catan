@@ -56,5 +56,10 @@ public abstract class ConstructionRequisition implements Purchase {
 	public boolean complete() {
 		return m_player.buy(this);
 	}
+	
+	@Override
+	public String toString() {
+		return "Construction Requisition: (" + m_construct + ")";
+	}
 
 }

@@ -3,6 +3,7 @@ package catan.engine.board.objects.buildings;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import catan.engine.board.Board;
 import catan.engine.board.BoardNotInitializedException;
@@ -12,6 +13,7 @@ import catan.engine.board.objects.InvalidLocationException;
 import catan.engine.board.objects.NoOwnerException;
 import catan.engine.board.objects.Productive;
 import catan.engine.board.objects.VertexObject;
+import catan.engine.board.tile.EdgeNotInitializedException;
 import catan.engine.board.tile.Tile;
 import catan.engine.board.tile.TileNotInitializedException;
 import catan.engine.board.tile.Vertex;
@@ -55,7 +57,7 @@ public class City extends VertexObject implements Productive {
 			}
 		}, ignoreLocation);
 	}
-	
+
 	/**
 	 * Creates a {@link City}
 	 * 
@@ -71,6 +73,58 @@ public class City extends VertexObject implements Productive {
 	}
 
 	/**
+	 * Gets all valid {@link City} locations on this {@link Board}
+	 * 
+	 * @param board
+	 *            the {@link Board} to check locations on
+	 * @param owner
+	 *            the hypothetical {@link Player} owning the new {@link City}
+	 * @return array containing all valid {@link Vertex} (vertices)
+	 * @throws BoardNotInitializedException
+	 *             if the {@link Board} has not been initialized
+	 */
+	public static Vertex[] getValidLocations(Board board, Player owner) throws BoardNotInitializedException {
+		ArrayList<Vertex> vertices = new ArrayList<Vertex>();
+
+		board.forAllObjects((object) -> {
+			try {
+				if (object instanceof Village && ((Village) object).getOwner() == owner) {
+					vertices.add(((Village) object).getPosition());
+				}
+			} catch (BoardObjectNotInitializedException e) {
+				e.printStackTrace();
+				System.exit(0);
+			}
+		});
+
+		Vertex[] output = new Vertex[vertices.size()];
+		output = vertices.toArray(output);
+		return output;
+	}
+	
+	/**
+	 * Determines whether the specified position would be a valid location for a
+	 * {@link City}
+	 * 
+	 * @param vertex
+	 *            the specified {@link Vertex}
+	 * @param owner
+	 *            the {@link Player} owning the {@link City} to be built
+	 * @return true if valid
+	 */
+	public static boolean isValidLocation(Vertex vertex, Player owner) {
+		return vertex.getBoard().getAllObjectsMatching((object) -> {
+			try {
+				return object instanceof Village && ((Village) object).getPosition().equals(vertex);
+			} catch (BoardObjectNotInitializedException e) {
+				e.printStackTrace();
+				System.exit(0);
+				return false;
+			}
+		}).length == 1;
+	}
+
+	/**
 	 * Determines whether this {@link City} is in a valid location
 	 * 
 	 * @returns true if this {@link City} is in a valid location
@@ -81,13 +135,24 @@ public class City extends VertexObject implements Productive {
 			return getPosition().getBoard().getAllObjectsMatching((object) -> {
 				try {
 					return (object instanceof Village || object instanceof City)
-							&& ((Vertex) object.getPosition()).isAdjacent(getPosition());
+							&& (((Vertex) object.getPosition()).isAdjacent(getPosition())
+									|| ((Vertex) object.getPosition()).equals(getPosition()));
 				} catch (VertexNotInitializedException | BoardObjectNotInitializedException e) {
 					e.printStackTrace();
 					System.exit(0);
 					return false;
 				}
-			}).length == 0;
+			}).length == 0 && getPosition().getBoard().getAllObjectsMatching((object) -> {
+				try {
+					return object instanceof Road && ((Road) object).getOwner() == getOwner()
+							&& (((Road) object).getPosition().getEndPoints()[0].equals(getPosition())
+									|| ((Road) object).getPosition().getEndPoints()[1].equals(getPosition()));
+				} catch (EdgeNotInitializedException | BoardObjectNotInitializedException e) {
+					e.printStackTrace();
+					System.exit(0);
+					return false;
+				}
+			}).length > 0;
 		} catch (BoardObjectNotInitializedException e) {
 			e.printStackTrace();
 			System.exit(0);

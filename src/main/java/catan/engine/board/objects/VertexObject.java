@@ -38,8 +38,7 @@ public abstract class VertexObject extends BoardObject<Vertex> {
 	 */
 	public VertexObject(Player owner, Vertex position, BufferedImage baseImage, boolean ignoreLocation)
 			throws InvalidLocationException {
-		super(position, baseImage, ignoreLocation);
-		m_owner = owner;
+		super(position, baseImage, owner, ignoreLocation);
 	}
 
 	/**
@@ -59,14 +58,6 @@ public abstract class VertexObject extends BoardObject<Vertex> {
 	public VertexObject(Vertex position, BufferedImage baseImage, boolean ignoreLocation)
 			throws InvalidLocationException {
 		this(null, position, baseImage, ignoreLocation);
-	}
-
-	/**
-	 * 
-	 * @return the {@link Player} owning this {@link VertexObject}
-	 */
-	public Player getOwner() {
-		return m_owner;
 	}
 
 	/**

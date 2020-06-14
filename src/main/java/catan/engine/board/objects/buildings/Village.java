@@ -3,7 +3,7 @@ package catan.engine.board.objects.buildings;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
+import java.util.ArrayList;
 
 import catan.engine.board.Board;
 import catan.engine.board.BoardNotInitializedException;
@@ -13,6 +13,7 @@ import catan.engine.board.objects.InvalidLocationException;
 import catan.engine.board.objects.NoOwnerException;
 import catan.engine.board.objects.Productive;
 import catan.engine.board.objects.VertexObject;
+import catan.engine.board.tile.EdgeNotInitializedException;
 import catan.engine.board.tile.Tile;
 import catan.engine.board.tile.TileNotInitializedException;
 import catan.engine.board.tile.Vertex;
@@ -56,7 +57,7 @@ public class Village extends VertexObject implements Productive {
 			}
 		}, ignoreLocation);
 	}
-	
+
 	/**
 	 * Creates a {@link Village}
 	 * 
@@ -88,6 +89,136 @@ public class Village extends VertexObject implements Productive {
 	}
 
 	/**
+	 * Gets all valid {@link Village} locations on this {@link Board}
+	 * 
+	 * @param board
+	 *            the {@link Board} to check locations on
+	 * @param owner
+	 *            the hypothetical {@link Player} owning the new {@link Village}
+	 * @return array containing all valid {@link Vertex} (vertices)
+	 * @throws BoardNotInitializedException
+	 *             if the {@link Board} has not been initialized
+	 */
+	public static Vertex[] getValidLocations(Board board, Player owner) throws BoardNotInitializedException {
+		int[][] map = new int[board.getDimensions()[0]][board.getDimensions()[1]];
+
+		board.forAllObjects((object) -> {
+			try {
+				if (object instanceof Road && ((Road) object).getOwner() == owner) {
+					if (map[((Road) object).getPosition().getEndPoints()[0]
+							.getPosition()[0]][((Road) object).getPosition().getEndPoints()[0].getPosition()[1]] == 0) {
+						map[((Road) object).getPosition().getEndPoints()[0]
+								.getPosition()[0]][((Road) object).getPosition().getEndPoints()[0]
+										.getPosition()[1]] = 1;
+					}
+					if (map[((Road) object).getPosition().getEndPoints()[1]
+							.getPosition()[0]][((Road) object).getPosition().getEndPoints()[1].getPosition()[1]] == 0) {
+						map[((Road) object).getPosition().getEndPoints()[1]
+								.getPosition()[0]][((Road) object).getPosition().getEndPoints()[1]
+										.getPosition()[1]] = 1;
+					}
+				}
+				if (object instanceof Village || object instanceof City) {
+					if (((Vertex) object.getPosition()).getPosition()[0] >= 0
+							&& ((Vertex) object.getPosition()).getPosition()[0] < board.getVertexDimensions()[0]
+							&& ((Vertex) object.getPosition()).getPosition()[1] >= 0
+							&& ((Vertex) object.getPosition()).getPosition()[1] < board.getVertexDimensions()[1]) {
+						// if valid vertex
+						map[((Vertex) object.getPosition()).getPosition()[0]][((Vertex) object.getPosition())
+								.getPosition()[1]] = 2;
+					}
+					
+					if (((Vertex) object.getPosition()).getPosition()[0] + 1 >= 0
+							&& ((Vertex) object.getPosition()).getPosition()[0] + 1 < board.getVertexDimensions()[0]
+							&& ((Vertex) object.getPosition()).getPosition()[1] >= 0
+							&& ((Vertex) object.getPosition()).getPosition()[1] < board.getVertexDimensions()[1]) {
+						// if valid vertex
+						map[((Vertex) object.getPosition()).getPosition()[0] + 1][((Vertex) object.getPosition())
+								.getPosition()[1]] = 2;
+					}
+					
+					if (((Vertex) object.getPosition()).getPosition()[0] - 1 >= 0
+							&& ((Vertex) object.getPosition()).getPosition()[0] < board.getVertexDimensions()[0]
+							&& ((Vertex) object.getPosition()).getPosition()[1] >= 0
+							&& ((Vertex) object.getPosition()).getPosition()[1] < board.getVertexDimensions()[1]) {
+						// if valid vertex
+						map[((Vertex) object.getPosition()).getPosition()[0] - 1][((Vertex) object.getPosition())
+								.getPosition()[1]] = 2;
+					}
+					
+					if (((Vertex) object.getPosition()).getPosition()[0] >= 0
+							&& ((Vertex) object.getPosition()).getPosition()[0] < board.getVertexDimensions()[0]
+							&& ((Vertex) object.getPosition()).getPosition()[1] + 1 >= 0
+							&& ((Vertex) object.getPosition()).getPosition()[1] + 1 < board.getVertexDimensions()[1]) {
+						// if valid vertex
+						map[((Vertex) object.getPosition()).getPosition()[0]][((Vertex) object.getPosition())
+								.getPosition()[1] + 1 ] = 2;
+					}
+					
+					if (((Vertex) object.getPosition()).getPosition()[0] >= 0
+							&& ((Vertex) object.getPosition()).getPosition()[0] < board.getVertexDimensions()[0]
+							&& ((Vertex) object.getPosition()).getPosition()[1] - 1 >= 0
+							&& ((Vertex) object.getPosition()).getPosition()[1] - 1 < board.getVertexDimensions()[1]) {
+						// if valid vertex
+						map[((Vertex) object.getPosition()).getPosition()[0]][((Vertex) object.getPosition())
+								.getPosition()[1] - 1 ] = 2;
+					}
+				}
+			} catch (VertexNotInitializedException | BoardObjectNotInitializedException | BoardNotInitializedException
+					| EdgeNotInitializedException e) {
+				e.printStackTrace();
+				System.exit(0);
+			}
+		});
+
+		ArrayList<Vertex> vertices = new ArrayList<Vertex>();
+		for (int i = 0; i < map.length; i++) {
+			for (int j = 0; j < map[0].length; j++) {
+				if (map[i][j] == 1) {
+					vertices.add(board.getVertex(i, j));
+				}
+			}
+		}
+		Vertex[] output = new Vertex[vertices.size()];
+		output = vertices.toArray(output);
+		return output;
+	}
+
+	/**
+	 * Determines whether the specified position would be a valid location for a
+	 * {@link Village}
+	 * 
+	 * @param vertex
+	 *            the specified {@link Vertex}
+	 * @param owner
+	 *            the {@link Player} who will be constructing this {@link Road}
+	 * @return true if valid
+	 */
+	public static boolean isValidLocation(Vertex vertex, Player owner) {
+		return vertex.getBoard().getAllObjectsMatching((object) -> {
+			try {
+				return (object instanceof Village || object instanceof City)
+						&& (((Vertex) object.getPosition()).isAdjacent(vertex)
+								|| ((Vertex) object.getPosition()).equals(vertex));
+			} catch (VertexNotInitializedException | BoardObjectNotInitializedException e) {
+				e.printStackTrace();
+				System.exit(0);
+				return false;
+			}
+		}).length == 0 && vertex.getBoard().getAllObjectsMatching((object) -> {
+			try {
+				return object instanceof Road && ((Road) object).getOwner() == owner
+						&& (((Road) object).getPosition().getEndPoints()[0].equals(vertex)
+								|| ((Road) object).getPosition().getEndPoints()[1].equals(vertex));
+			} catch (EdgeNotInitializedException | BoardObjectNotInitializedException e) {
+				e.printStackTrace();
+				System.exit(0);
+				return false;
+			}
+		}).length > 0;
+	}
+
+	/**
 	 * Determines whether this {@link Village} is in a valid location
 	 * 
 	 * @returns true if this {@link Village} is in a valid location
@@ -95,16 +226,7 @@ public class Village extends VertexObject implements Productive {
 	@Override
 	public boolean validLocation() {
 		try {
-			return getPosition().getBoard().getAllObjectsMatching((object) -> {
-				try {
-					return (object instanceof Village || object instanceof City)
-							&& ((Vertex) object.getPosition()).isAdjacent(getPosition());
-				} catch (VertexNotInitializedException | BoardObjectNotInitializedException e) {
-					e.printStackTrace();
-					System.exit(0);
-					return false;
-				}
-			}).length == 0;
+			return isValidLocation(getPosition(), getOwner());
 		} catch (BoardObjectNotInitializedException e) {
 			e.printStackTrace();
 			System.exit(0);

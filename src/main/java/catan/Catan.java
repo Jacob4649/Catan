@@ -13,6 +13,7 @@ import catan.engine.board.objects.BoardObjectNotInitializedException;
 import catan.engine.board.objects.InvalidLocationException;
 import catan.engine.board.objects.buildings.Road;
 import catan.engine.board.objects.buildings.Village;
+import catan.engine.moves.Move;
 import catan.engine.player.Player;
 import catan.engine.player.PlayerColor;
 import catan.engine.player.PlayerCountOutOfBoundsException;
@@ -154,10 +155,11 @@ public class Catan {
 
 		catan.setBoard(Board.randomLandBoard());
 
-		catan.getBoard().addObject(new Village(catan.getPlayer(), catan.getBoard().getVertex(5, 5)));
 		catan.getBoard().addObject(
 				new Road(catan.getPlayer(), catan.getBoard().getEdge(new int[] { 1, 2 }, new int[] { 1, 1 }), true));
-
+		catan.getBoard().addObject(
+				new Road(catan.getPlayer(), catan.getBoard().getEdge(new int[] { 1, 2 }, new int[] { 2, 2 })));
+		
 		JFrame frame = new JFrame("Catan");
 
 		frame.getContentPane().add(new BoardPanel(catan.getBoard()) {

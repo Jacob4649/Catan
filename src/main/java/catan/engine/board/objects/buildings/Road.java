@@ -3,8 +3,14 @@ package catan.engine.board.objects.buildings;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import catan.engine.board.Board;
+import catan.engine.board.BoardNotInitializedException;
 import catan.engine.board.objects.BoardObjectNotInitializedException;
 import catan.engine.board.objects.EdgeObject;
 import catan.engine.board.objects.InvalidLocationException;
@@ -48,7 +54,7 @@ public class Road extends EdgeObject {
 			}
 		}, ignoreLocation);
 	}
-	
+
 	/**
 	 * Creates a new {@link Road}
 	 * 
@@ -64,6 +70,98 @@ public class Road extends EdgeObject {
 	}
 
 	/**
+	 * Gets all valid {@link Road} locations on this {@link Board}
+	 * 
+	 * @param board
+	 *            the {@link Board} to check locations on
+	 * @param owner
+	 *            the hypothetical {@link Player} owning the new {@link Road}
+	 * @return array containing all valid {@link Edge}s
+	 * @throws BoardNotInitializedException
+	 *             if the {@link Board} has not been initialized
+	 */
+	public static Edge[] getValidLocations(Board board, Player owner) throws BoardNotInitializedException {
+		ArrayList<Edge> disallowed = new ArrayList<Edge>();
+
+		board.forAllObjects((object) -> {
+			try {
+				if (object instanceof Road) {
+					disallowed.add(((Road) object).getPosition());
+				}
+			} catch (BoardObjectNotInitializedException e) {
+				e.printStackTrace();
+				System.exit(0);
+			}
+		});
+
+		ArrayList<Edge> edges = new ArrayList<Edge>();
+
+		board.forAllObjects((object) -> {
+			try {
+				if (object instanceof Road && ((Road) object).getOwner() == owner) {
+					ArrayList<Edge> newEdges = new ArrayList<Edge>(
+							Arrays.asList(((Road) object).getPosition().getAdjacentEdges()));
+					newEdges.removeAll(edges);
+					edges.addAll(newEdges);
+				}
+			} catch (BoardNotInitializedException | VertexNotInitializedException | EdgeNotInitializedException
+					| BoardObjectNotInitializedException e) {
+				e.printStackTrace();
+			}
+		});
+
+		edges.removeAll(disallowed);
+
+		Edge[] output = new Edge[edges.size()];
+		output = edges.toArray(output);
+		return output;
+	}
+
+	/**
+	 * Determines whether the specified position would be a valid location for a
+	 * {@link Road}
+	 * 
+	 * @param edge
+	 *            the specified {@link Edge}
+	 * @param owner
+	 *            the {@link Player} who would be constructing the {@link Road}
+	 * @return true if valid
+	 */
+	public static boolean isValidLocation(Edge edge, Player owner) {
+		try {
+			Vertex[] endPoints = edge.getEndPoints();
+			for (Vertex vertex : endPoints) {
+				if (edge.getBoard().getAllObjectsMatching((object) -> {
+					try {
+						return object instanceof Road && ((Road) object).getOwner() == owner
+								&& (((Road) object).getPosition().getEndPoints()[0].equals(vertex)
+										|| ((Road) object).getPosition().getEndPoints()[1].equals(vertex));
+					} catch (EdgeNotInitializedException | BoardObjectNotInitializedException e) {
+						e.printStackTrace();
+						System.exit(0);
+						return false;
+					}
+				}).length > 0 && edge.getBoard().getAllObjectsMatching((object) -> {
+					try {
+						return object instanceof Road && ((Road) object).getPosition().equals(edge);
+					} catch (BoardObjectNotInitializedException e) {
+						e.printStackTrace();
+						System.exit(0);
+						return false;
+					}
+				}).length == 0) {
+					return true;
+				}
+			}
+			return false;
+		} catch (EdgeNotInitializedException e) {
+			e.printStackTrace();
+			System.exit(0);
+			return false;
+		}
+	}
+
+	/**
 	 * Determines whether this {@link City} is in a valid location
 	 * 
 	 * @returns true if this {@link City} is in a valid location
@@ -71,25 +169,8 @@ public class Road extends EdgeObject {
 	@Override
 	public boolean validLocation() {
 		try {
-			Vertex[] endPoints = getPosition().getEndPoints();
-			for (Vertex vertex : endPoints) {
-				if (getPosition().getBoard().getAllObjectsMatching((object) -> {
-					try {
-						return object instanceof Road && object != this && ((Road) object).getOwner() == getOwner()
-								&& (((Road) object).getPosition().getEndPoints()[0].isAdjacent(vertex)
-										|| ((Road) object).getPosition().getEndPoints()[1].isAdjacent(vertex));
-					} catch (VertexNotInitializedException | EdgeNotInitializedException
-							| BoardObjectNotInitializedException e) {
-						e.printStackTrace();
-						System.exit(0);
-						return false;
-					}
-				}).length > 0) {
-					return true;
-				}
-			}
-			return false;
-		} catch (BoardObjectNotInitializedException | EdgeNotInitializedException e) {
+			return isValidLocation(getPosition(), getOwner());
+		} catch (BoardObjectNotInitializedException e) {
 			e.printStackTrace();
 			System.exit(0);
 			return false;
@@ -125,6 +206,17 @@ public class Road extends EdgeObject {
 			e.printStackTrace();
 			System.exit(0);
 			return new int[] { 0, 0 };
+		}
+	}
+
+	@Override
+	public String toString() {
+		try {
+			return "Road: (" + getPosition() + ")";
+		} catch (BoardObjectNotInitializedException e) {
+			e.printStackTrace();
+			System.exit(0);
+			return "Road: (Not Initialized)";
 		}
 	}
 

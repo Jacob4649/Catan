@@ -42,16 +42,7 @@ public abstract class EdgeObject extends BoardObject<Edge> {
 	 */
 	public EdgeObject(Player owner, Edge position, BufferedImage baseImage, boolean ignoreLocation)
 			throws InvalidLocationException {
-		super(position, baseImage, ignoreLocation);
-		m_owner = owner;
-	}
-
-	/**
-	 * 
-	 * @return the {@link Player} owning this {@link Road}
-	 */
-	public Player getOwner() {
-		return m_owner;
+		super(position, baseImage, owner, ignoreLocation);
 	}
 
 	/**

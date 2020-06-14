@@ -12,7 +12,7 @@ import catan.engine.resources.ResourceBundle;
 public class Player {
 
 	private PlayerColor m_color;
-	private ResourceBundle m_resources = new ResourceBundle();
+	private ResourceBundle m_resources = new ResourceBundle(100, 100, 100, 100, 100);
 
 	/**
 	 * Creates a player with the specified color

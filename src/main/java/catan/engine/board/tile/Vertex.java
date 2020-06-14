@@ -86,6 +86,49 @@ public class Vertex {
 	}
 
 	/**
+	 * 
+	 * @return array of all {@link Vertex} (vertices) adjacent to this one
+	 * @throws BoardNotInitializedException
+	 *             if the {@link Board} has not been initialized
+	 * @throws VertexNotInitializedException
+	 *             if this {@link Vertex} has not been initialized
+	 */
+	public Vertex[] getAdjacentVertices() throws BoardNotInitializedException, VertexNotInitializedException {
+		if (m_row == -1 || m_column == -1) {
+			throw new VertexNotInitializedException();
+		}
+		ArrayList<Vertex> vertices = new ArrayList<Vertex>();
+
+		if (m_row + 1 >= 0 && m_row + 1 < m_board.getVertexDimensions()[0] && m_column >= 0
+				&& m_column < m_board.getVertexDimensions()[1]) {
+			// if valid vertex
+			vertices.add(m_board.getVertex(m_row + 1, m_column));
+		}
+
+		if (m_row - 1 >= 0 && m_row - 1 < m_board.getVertexDimensions()[0] && m_column >= 0
+				&& m_column < m_board.getVertexDimensions()[1]) {
+			// if valid vertex
+			vertices.add(m_board.getVertex(m_row - 1, m_column));
+		}
+
+		if (m_row >= 0 && m_row < m_board.getVertexDimensions()[0] && m_column + 1 >= 0
+				&& m_column + 1 < m_board.getVertexDimensions()[1]) {
+			// if valid vertex
+			vertices.add(m_board.getVertex(m_row, m_column + 1));
+		}
+
+		if (m_row >= 0 && m_row < m_board.getVertexDimensions()[0] && m_column - 1 >= 0
+				&& m_column - 1 < m_board.getVertexDimensions()[1]) {
+			// if valid vertex
+			vertices.add(m_board.getVertex(m_row, m_column - 1));
+		}
+
+		Vertex[] output = new Vertex[vertices.size()];
+		output = vertices.toArray(output);
+		return output;
+	}
+
+	/**
 	 * Determines whether this {@link Vertex} is adjacent to the specified
 	 * {@link Vertex}
 	 * 
@@ -130,7 +173,9 @@ public class Vertex {
 			return object instanceof Vertex && ((Vertex) object).getBoard() == getBoard()
 					&& Arrays.equals(((Vertex) object).getPosition(), getPosition());
 		} catch (VertexNotInitializedException e) {
-			return object instanceof Vertex && ((Vertex) object).getBoard() == getBoard();
+			e.printStackTrace();
+			System.exit(0);
+			return false;
 		}
 	}
 

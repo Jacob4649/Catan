@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import catan.engine.board.Board;
 import catan.engine.board.tile.Tile;
 import catan.engine.board.tile.Vertex;
+import catan.engine.player.Player;
 import catan.renderer.panel.BoardPanel;
 
 /**
@@ -22,6 +23,7 @@ public abstract class BoardObject<T> {
 
 	protected static ObjectImageCollection m_baseImages = new ObjectImageCollection();
 	protected BufferedImage m_image;
+	private Player m_owner;
 	private T m_position;
 
 	/**
@@ -38,8 +40,9 @@ public abstract class BoardObject<T> {
 	 * @throws InvalidLocationException
 	 *             if initialized in an invalid location
 	 */
-	public BoardObject(T position, BufferedImage baseImage, boolean ignoreLocation) throws InvalidLocationException {
+	public BoardObject(T position, BufferedImage baseImage, Player owner, boolean ignoreLocation) throws InvalidLocationException {
 		m_position = position;
+		m_owner = owner;
 		m_baseImages.addImage(baseImage, getClass());
 		if (!validLocation() && !ignoreLocation) {
 			throw new InvalidLocationException();
@@ -47,6 +50,14 @@ public abstract class BoardObject<T> {
 		
 	}
 
+	/**
+	 * 
+	 * @return the {@link Player} owning this {@link BoardObject}
+	 */
+	public Player getOwner() {
+		return m_owner;
+	}
+	
 	/**
 	 * 
 	 * @return the {@link BufferedImage} that should be used to display this

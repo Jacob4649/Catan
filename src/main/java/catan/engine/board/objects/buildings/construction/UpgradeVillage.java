@@ -49,4 +49,9 @@ public class UpgradeVillage extends ConstructionRequisition {
 		}
 		return true;
 	}
+	
+	@Override
+	public String toString() {
+		return "Upgrade Village: (" + getItem() + ")";
+	}
 }

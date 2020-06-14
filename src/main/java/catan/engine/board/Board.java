@@ -6,11 +6,23 @@ import catan.Catan;
 import catan.engine.board.objects.BoardObject;
 import catan.engine.board.objects.BoardObjectConsumer;
 import catan.engine.board.objects.BoardObjectMatcher;
+import catan.engine.board.objects.BoardObjectNotInitializedException;
+import catan.engine.board.objects.InvalidLocationException;
+import catan.engine.board.objects.buildings.City;
+import catan.engine.board.objects.buildings.Road;
+import catan.engine.board.objects.buildings.Village;
+import catan.engine.board.objects.buildings.construction.ConstructRoad;
+import catan.engine.board.objects.buildings.construction.ConstructVillage;
+import catan.engine.board.objects.buildings.construction.UpgradeVillage;
 import catan.engine.board.tile.Edge;
 import catan.engine.board.tile.Tile;
 import catan.engine.board.tile.TileNotInitializedException;
 import catan.engine.board.tile.TileType;
 import catan.engine.board.tile.Vertex;
+import catan.engine.moves.Move;
+import catan.engine.moves.PurchaseMove;
+import catan.engine.player.Player;
+import catan.engine.resources.PurchaseCosts;
 
 /**
  * Class representing the board for a game of {@link Catan} Tile positions are
@@ -28,7 +40,7 @@ public class Board {
 	protected Tile[][] m_tileMap;
 	protected ArrayList<BoardObject> m_objects = new ArrayList<BoardObject>();
 	private BoardObjectConsumer m_objectAddedListener;
-	
+
 	/**
 	 * 
 	 * @return a random, landlocked {@link Board} of the default size
@@ -222,7 +234,7 @@ public class Board {
 	public void addObject(BoardObject object) {
 		m_objects.add(object);
 		if (m_objectAddedListener != null) {
-			m_objectAddedListener.consume(object);	
+			m_objectAddedListener.consume(object);
 		}
 	}
 
@@ -291,13 +303,64 @@ public class Board {
 	}
 
 	/**
+	 * Performs the specified operation on all {@link BoardObject}s
+	 * 
+	 * @param consumer
+	 *            the operation to perform
+	 */
+	public void forAllObjects(BoardObjectConsumer consumer) {
+		for (BoardObject object : m_objects) {
+			consumer.consume(object);
+		}
+	}
+
+	/**
 	 * Sets the code to run when an object is added to this {@link Board}
-	 * @param listener the {@link ObjectConsumer} to run
+	 * 
+	 * @param listener
+	 *            the {@link ObjectConsumer} to run
 	 */
 	public void setObjectAddedListener(BoardObjectConsumer listener) {
 		m_objectAddedListener = listener;
 	}
-	
+
+	/**
+	 * Gets all moves available to a single {@link Player}
+	 * 
+	 * @param player
+	 *            the {@link Player}
+	 * @return array containing the {@link Move}s
+	 * @throws BoardNotInitializedException
+	 *             if this {@link Board} has not been initialized
+	 * @throws InvalidLocationException if location supplied to any {@link Move} is invalid
+	 */
+	public Move[] getMovesForPlayer(Player player) throws BoardNotInitializedException, InvalidLocationException {
+		ArrayList<Move> moves = new ArrayList<Move>();
+		if (player.getResources().greaterOrEqualTo(PurchaseCosts.VILLAGE_COST)) {
+			for (Vertex vertex : Village.getValidLocations(this, player)) {
+				moves.add(new PurchaseMove(new ConstructVillage(new Village(player, vertex)), player));
+			}
+		}
+
+		if (player.getResources().greaterOrEqualTo(PurchaseCosts.CITY_COST)) {
+			for (BoardObject village : getAllObjectsMatching((object) -> {
+				return object instanceof Village && ((Village) object).getOwner() == player;
+			})) {
+				moves.add(new PurchaseMove(new UpgradeVillage((Village) village), player));
+			}
+		}
+
+		if (player.getResources().greaterOrEqualTo(PurchaseCosts.ROAD_COST)) {
+			for (Edge edge : Road.getValidLocations(this, player)) {
+				moves.add(new PurchaseMove(new ConstructRoad(new Road(player, edge)), player));
+			}
+		}
+		
+		Move[] output = new Move[moves.size()];
+		output = moves.toArray(output);
+		return output;
+	}
+
 	@Override
 	public String toString() {
 		return "Board";
