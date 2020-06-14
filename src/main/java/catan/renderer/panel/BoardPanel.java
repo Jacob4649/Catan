@@ -76,6 +76,7 @@ public class BoardPanel extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				m_selected = null;
+				m_selectedObject = null;
 			}
 		});
 
@@ -137,6 +138,16 @@ public class BoardPanel extends JPanel {
 						m_mouseLock = false;
 					}).start();
 				}
+			}
+		});
+
+		// setup on add scaling
+		m_board.setObjectAddedListener((object) -> {
+			try {
+				object.getImage(m_board.getDimensions(), new int[] { getWidth(), getHeight() });
+			} catch (BoardObjectNotInitializedException | BoardNotInitializedException e) {
+				e.printStackTrace();
+				System.exit(0);
 			}
 		});
 	}
@@ -246,32 +257,67 @@ public class BoardPanel extends JPanel {
 						new int[] { getWidth(), getHeight() });
 				Point p = MouseInfo.getPointerInfo().getLocation();
 				SwingUtilities.convertPointFromScreen(p, this);
-				if (m_selectVertex) {
-					// vertex mode
-					int[] mapDimensions = m_board.getDimensions();
-					int[] dimensions = m_board.getVertexDimensions();
-					int[] vertexPos = pixelToVertex((int) p.getX(), (int) p.getY());
-					// check bounds
-					if (vertexPos[0] >= 0 && vertexPos[0] < dimensions[0] && vertexPos[1] >= 0
-							&& vertexPos[1] < dimensions[1]) {
-						g2D.drawRect(
-								(int) ((((double) vertexPos[1] / (double) mapDimensions[1]) * (double) getWidth())
-										- (VERTEX_INDICATOR_RELATIVE_SIZE * ((double) (tileDimensions[0]) / 2d))),
-								(int) ((((double) vertexPos[0] / (double) mapDimensions[0]) * (double) getHeight())
-										- (VERTEX_INDICATOR_RELATIVE_SIZE * ((double) (tileDimensions[1])) / 2d)),
-								(int) (VERTEX_INDICATOR_RELATIVE_SIZE * ((double) (tileDimensions[0]))),
-								(int) (VERTEX_INDICATOR_RELATIVE_SIZE * ((double) (tileDimensions[1]))));
+				BoardObject preSelectedObject = null;
+				if (m_selectObjects) {
+					// get if mouse is hovering over an object
+					for (BoardObject object : m_board.getObjects()) {
+						try {
+							int[] firstCorner = object.getImagePosition(m_board.getDimensions(),
+									new int[] { getWidth(), getHeight() });
+							int[] dimensions = object.getImageDimensions(m_board.getDimensions(),
+									new int[] { getWidth(), getHeight() });
+							if (p.getX() > firstCorner[0] && p.getX() < firstCorner[0] + dimensions[0]
+									&& p.getY() > firstCorner[1] && p.getY() < firstCorner[1] + dimensions[1]) {
+								preSelectedObject = object;
+							}
+						} catch (BoardObjectNotInitializedException | BoardNotInitializedException e) {
+							e.printStackTrace();
+							System.exit(0);
+						}
+					}
+				}
+				if (preSelectedObject != null) {
+					// object mode
+					try {
+						int[] objectPosition = preSelectedObject.getImagePosition(m_board.getDimensions(),
+								new int[] { getWidth(), getHeight() });
+						int[] objectDimensions = preSelectedObject.getImageDimensions(m_board.getDimensions(),
+								new int[] { getWidth(), getHeight() });
+
+						g2D.drawRect(objectPosition[0], objectPosition[1], objectDimensions[0], objectDimensions[1]);
+					} catch (BoardObjectNotInitializedException e) {
+						e.printStackTrace();
+						System.exit(0);
 					}
 				} else {
-					// tile mode
-					int[] dimensions = m_board.getDimensions();
-					int[] tilePos = pixelToPos((int) p.getX(), (int) p.getY());
-					// check bounds
-					if (tilePos[0] >= 0 && tilePos[0] < dimensions[0] && tilePos[1] >= 0
-							&& tilePos[1] < dimensions[1]) {
-						g2D.drawRect((int) (((float) tilePos[1] / (float) dimensions[1]) * getWidth()),
-								(int) (((float) tilePos[0] / (float) dimensions[0]) * getHeight()), tileDimensions[0],
-								tileDimensions[1]);
+					// tile or vertex
+					if (m_selectVertex) {
+						// vertex mode
+						int[] mapDimensions = m_board.getDimensions();
+						int[] dimensions = m_board.getVertexDimensions();
+						int[] vertexPos = pixelToVertex((int) p.getX(), (int) p.getY());
+						// check bounds
+						if (vertexPos[0] >= 0 && vertexPos[0] < dimensions[0] && vertexPos[1] >= 0
+								&& vertexPos[1] < dimensions[1]) {
+							g2D.drawRect(
+									(int) ((((double) vertexPos[1] / (double) mapDimensions[1]) * (double) getWidth())
+											- (VERTEX_INDICATOR_RELATIVE_SIZE * ((double) (tileDimensions[0]) / 2d))),
+									(int) ((((double) vertexPos[0] / (double) mapDimensions[0]) * (double) getHeight())
+											- (VERTEX_INDICATOR_RELATIVE_SIZE * ((double) (tileDimensions[1])) / 2d)),
+									(int) (VERTEX_INDICATOR_RELATIVE_SIZE * ((double) (tileDimensions[0]))),
+									(int) (VERTEX_INDICATOR_RELATIVE_SIZE * ((double) (tileDimensions[1]))));
+						}
+					} else {
+						// tile mode
+						int[] dimensions = m_board.getDimensions();
+						int[] tilePos = pixelToPos((int) p.getX(), (int) p.getY());
+						// check bounds
+						if (tilePos[0] >= 0 && tilePos[0] < dimensions[0] && tilePos[1] >= 0
+								&& tilePos[1] < dimensions[1]) {
+							g2D.drawRect((int) (((float) tilePos[1] / (float) dimensions[1]) * getWidth()),
+									(int) (((float) tilePos[0] / (float) dimensions[0]) * getHeight()),
+									tileDimensions[0], tileDimensions[1]);
+						}
 					}
 				}
 			}
@@ -381,10 +427,12 @@ public class BoardPanel extends JPanel {
 	public void setSelectObject(boolean select) {
 		m_selectObjects = select;
 	}
-	
+
 	/**
 	 * Sets the selected object
-	 * @param object the {@link BoardObject} to select
+	 * 
+	 * @param object
+	 *            the {@link BoardObject} to select
 	 */
 	public void setSelectedObject(BoardObject object) {
 		m_selectedObject = object;

@@ -1,5 +1,6 @@
 package catan.engine.player;
 
+import catan.engine.resources.Purchase;
 import catan.engine.resources.ResourceBundle;
 
 /**
@@ -38,6 +39,15 @@ public class Player {
 	 */
 	public ResourceBundle getResources() {
 		return m_resources;
+	}
+	
+	/**
+	 * {@link Player} attempts to buy the specified item
+	 * @param purchase the {@link Purchase} to buy
+	 * @return true if the {@link Purchase} was competed successfully
+	 */
+	public boolean buy(Purchase purchase) {
+		return purchase.charge(this);
 	}
 
 }

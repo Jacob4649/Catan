@@ -44,6 +44,7 @@ public abstract class BoardObject<T> {
 		if (!validLocation() && !ignoreLocation) {
 			throw new InvalidLocationException();
 		}
+		
 	}
 
 	/**

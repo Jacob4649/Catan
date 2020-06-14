@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import catan.Catan;
 import catan.engine.board.objects.BoardObject;
+import catan.engine.board.objects.BoardObjectConsumer;
 import catan.engine.board.objects.BoardObjectMatcher;
 import catan.engine.board.tile.Edge;
 import catan.engine.board.tile.Tile;
@@ -26,7 +27,8 @@ public class Board {
 
 	protected Tile[][] m_tileMap;
 	protected ArrayList<BoardObject> m_objects = new ArrayList<BoardObject>();
-
+	private BoardObjectConsumer m_objectAddedListener;
+	
 	/**
 	 * 
 	 * @return a random, landlocked {@link Board} of the default size
@@ -219,6 +221,9 @@ public class Board {
 	 */
 	public void addObject(BoardObject object) {
 		m_objects.add(object);
+		if (m_objectAddedListener != null) {
+			m_objectAddedListener.consume(object);	
+		}
 	}
 
 	/**
@@ -285,6 +290,14 @@ public class Board {
 		return output;
 	}
 
+	/**
+	 * Sets the code to run when an object is added to this {@link Board}
+	 * @param listener the {@link ObjectConsumer} to run
+	 */
+	public void setObjectAddedListener(BoardObjectConsumer listener) {
+		m_objectAddedListener = listener;
+	}
+	
 	@Override
 	public String toString() {
 		return "Board";

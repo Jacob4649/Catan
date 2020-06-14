@@ -3,6 +3,7 @@ package catan.engine.board.objects.buildings;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 
 import catan.engine.board.Board;
 import catan.engine.board.BoardNotInitializedException;
