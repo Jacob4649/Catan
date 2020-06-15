@@ -1,5 +1,6 @@
 package catan.engine.board.objects;
 
+import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -40,14 +41,15 @@ public abstract class BoardObject<T> {
 	 * @throws InvalidLocationException
 	 *             if initialized in an invalid location
 	 */
-	public BoardObject(T position, BufferedImage baseImage, Player owner, boolean ignoreLocation) throws InvalidLocationException {
+	public BoardObject(T position, BufferedImage baseImage, Player owner, boolean ignoreLocation)
+			throws InvalidLocationException {
 		m_position = position;
 		m_owner = owner;
 		m_baseImages.addImage(baseImage, getClass());
 		if (!validLocation() && !ignoreLocation) {
 			throw new InvalidLocationException();
 		}
-		
+
 	}
 
 	/**
@@ -57,7 +59,7 @@ public abstract class BoardObject<T> {
 	public Player getOwner() {
 		return m_owner;
 	}
-	
+
 	/**
 	 * 
 	 * @return the {@link BufferedImage} that should be used to display this
@@ -117,6 +119,14 @@ public abstract class BoardObject<T> {
 			g2D.drawImage(image, 0, 0, null);
 			g2D.dispose();
 			m_image = bufferedImage;
+		}
+
+		// color image if possible
+		if (m_owner != null) {
+			Graphics2D g2D = m_image.createGraphics();
+			g2D.setColor(m_owner.getColor().getColor());
+			g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.25f));
+			g2D.fillRect(0, 0, m_image.getWidth(), m_image.getHeight());
 		}
 
 		return m_image;

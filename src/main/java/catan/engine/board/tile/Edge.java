@@ -104,7 +104,7 @@ public class Edge {
 	 *         (vertices) of this {@link Edge} {x/col, y/row}
 	 * @throws VertexNotInitializedException
 	 */
-	private int[] getDelta() throws VertexNotInitializedException {
+	public int[] getDelta() throws VertexNotInitializedException {
 		return m_vertex1.getDistanceFrom(m_vertex2);
 	}
 

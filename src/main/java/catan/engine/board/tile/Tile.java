@@ -71,7 +71,7 @@ public class Tile {
 	 *         frequency
 	 */
 	public static int getFrequencyProbability(int frequency) {
-		return FREQUENCY_DISTRIBUTION[frequency + FREQUENCY_MIN];
+		return FREQUENCY_DISTRIBUTION[frequency - FREQUENCY_MIN];
 	}
 
 	/**
@@ -299,6 +299,11 @@ public class Tile {
 		}
 
 		return frequencies;
+	}
+	
+	@Override
+	public String toString() {
+		return "Tile: (" + m_type + ", Value: (" + m_frequency + "))";
 	}
 
 }

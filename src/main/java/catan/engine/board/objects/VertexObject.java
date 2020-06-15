@@ -18,8 +18,6 @@ import catan.renderer.panel.BoardPanel;
  */
 public abstract class VertexObject extends BoardObject<Vertex> {
 
-	protected Player m_owner = null;
-
 	/**
 	 * Creates a new {@link VertexObject}
 	 * 
@@ -88,35 +86,6 @@ public abstract class VertexObject extends BoardObject<Vertex> {
 			System.exit(0);
 			return new int[] { 0, 0 };
 		}
-	}
-
-	/**
-	 * 
-	 * @param mapDimensions
-	 *            the dimensions of the map this {@link BoardObject} is on in
-	 *            tiles {row, col}
-	 * @param panelDimensions
-	 *            the dimensions of the panel this {@link BoardObject} is on in
-	 *            pixels {x, y}
-	 * @return a scaled version of the {@link BufferedImage} that should be used
-	 *         to display this {@link BoardObject}
-	 * @throws BoardObjectNotInitializedException
-	 *             if this {@link VertexObject} is not initialized
-	 */
-	@Override
-	public BufferedImage getImage(int[] mapDimensions, int[] panelDimensions)
-			throws BoardObjectNotInitializedException {
-		super.getImage(mapDimensions, panelDimensions);
-
-		// color image if possible
-		if (m_owner != null) {
-			Graphics2D g2D = m_image.createGraphics();
-			g2D.setColor(m_owner.getColor().getColor());
-			g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.25f));
-			g2D.fillRect(0, 0, m_image.getWidth(), m_image.getHeight());
-		}
-
-		return m_image;
 	}
 
 	@Override

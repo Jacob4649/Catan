@@ -23,6 +23,8 @@ public class ResourceBundle {
 	private int m_grain = 0;
 	private int m_sheep = 0;
 
+	private Runnable m_largeScaleUpdateListener = null;
+
 	/**
 	 * Creates a new {@link ResourceBundle}
 	 */
@@ -159,6 +161,9 @@ public class ResourceBundle {
 		addStone(bundle.getStone());
 		addGrain(bundle.getGrain());
 		addSheep(bundle.getSheep());
+		if (m_largeScaleUpdateListener != null) {
+			m_largeScaleUpdateListener.run();
+		}
 		return this;
 	}
 
@@ -177,6 +182,9 @@ public class ResourceBundle {
 		addStone(-bundle.getStone());
 		addGrain(-bundle.getGrain());
 		addSheep(-bundle.getSheep());
+		if (m_largeScaleUpdateListener != null) {
+			m_largeScaleUpdateListener.run();
+		}
 		return this;
 	}
 
@@ -190,6 +198,41 @@ public class ResourceBundle {
 	public boolean greaterOrEqualTo(ResourceBundle bundle) {
 		return getWood() >= bundle.getWood() && getClay() >= bundle.getClay() && getGrain() >= bundle.getGrain()
 				&& getStone() >= bundle.getStone() && getSheep() >= bundle.getSheep();
+	}
+
+	/**
+	 * Sets the code to run when large scale changes are made to this
+	 * {@link ResourceBundle}
+	 * 
+	 * @param listener
+	 *            {@link Runnable} containing the code to run
+	 */
+	public void setOnChangeListener(Runnable listener) {
+		m_largeScaleUpdateListener = listener;
+	}
+
+	/**
+	 * 
+	 * @param resource
+	 *            int resource
+	 * @return the specified int resource as a {@link String}
+	 */
+	public static String toString(int resource) {
+		switch (resource) {
+		default:
+		case NULL:
+			return "Null";
+		case WOOD:
+			return "Wood";
+		case CLAY:
+			return "Clay";
+		case STONE:
+			return "Stone";
+		case GRAIN:
+			return "Grain";
+		case SHEEP:
+			return "Sheep";
+		}
 	}
 
 	@Override

@@ -55,6 +55,16 @@ public class BoardPanel extends JPanel {
 	private SelectedPositionListener m_selectedTileListener;
 	private SelectedPositionListener m_selectedVertexListener;
 	private SelectedBoardObjectListener m_selectedObjectListener;
+	private Runnable m_deselectListener;
+	private AbstractAction m_deselect = new AbstractAction() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			setDefault();
+			if (m_deselectListener != null) {
+				m_deselectListener.run();
+			}
+		}
+	};
 
 	private Board m_board;
 
@@ -72,13 +82,7 @@ public class BoardPanel extends JPanel {
 
 		// Deselect keybinding
 		getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "deselect");
-		getActionMap().put("deselect", new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				m_selected = null;
-				m_selectedObject = null;
-			}
-		});
+		getActionMap().put("deselect", m_deselect);
 
 		// mouse listener
 		addMouseListener(new MouseAdapter() {
@@ -347,6 +351,20 @@ public class BoardPanel extends JPanel {
 	}
 
 	/**
+	 * Sets the {@link BoardPanel} to a default state of operation
+	 */
+	public void setDefault() {
+		m_selected = null;
+		m_selectedObject = null;
+		setPreSelection(false);
+		setSelectVertex(false);
+		setSelectObject(false);
+		setOnTileSelectedListener(null);
+		setOnObjectSelectedListener(null);
+		setOnVertexSelectedListener(null);
+	}
+
+	/**
 	 * Resizes all drawn {@link BufferedImage}s
 	 * 
 	 * @throws BoardNotInitializedException
@@ -364,6 +382,17 @@ public class BoardPanel extends JPanel {
 				System.exit(0);
 			}
 		}
+	}
+
+	/**
+	 * Sets the {@link Runnable} to run when escape is pressed for this
+	 * {@link BoardPanel}
+	 * 
+	 * @param listener
+	 *            the {@link Runnable} to assign
+	 */
+	public void setOnDeselectListener(Runnable listener) {
+		m_deselectListener = listener;
 	}
 
 	/**
@@ -436,6 +465,13 @@ public class BoardPanel extends JPanel {
 	 */
 	public void setSelectedObject(BoardObject object) {
 		m_selectedObject = object;
+	}
+
+	/**
+	 * Deselects and removes all listener
+	 */
+	public void deselect() {
+		m_deselect.actionPerformed(null);
 	}
 
 	/**

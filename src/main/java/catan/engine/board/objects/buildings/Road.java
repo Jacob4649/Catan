@@ -49,7 +49,7 @@ public class Road extends EdgeObject {
 				BufferedImage.TYPE_INT_RGB) {
 			{
 				Graphics2D g2D = createGraphics();
-				g2D.setColor(new Color(155, 155, 155));
+				g2D.setColor(new Color(225, 225, 225));
 				g2D.fillRect(0, 0, getWidth(), getHeight());
 			}
 		}, ignoreLocation);
@@ -129,6 +129,9 @@ public class Road extends EdgeObject {
 	 */
 	public static boolean isValidLocation(Edge edge, Player owner) {
 		try {
+			if (Math.abs(edge.getDelta()[0]) + Math.abs(edge.getDelta()[1]) != 1) {
+				return false;
+			}
 			Vertex[] endPoints = edge.getEndPoints();
 			for (Vertex vertex : endPoints) {
 				if (edge.getBoard().getAllObjectsMatching((object) -> {
@@ -154,7 +157,7 @@ public class Road extends EdgeObject {
 				}
 			}
 			return false;
-		} catch (EdgeNotInitializedException e) {
+		} catch (EdgeNotInitializedException | VertexNotInitializedException e) {
 			e.printStackTrace();
 			System.exit(0);
 			return false;

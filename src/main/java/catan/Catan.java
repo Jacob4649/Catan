@@ -8,17 +8,16 @@ import javax.swing.JFrame;
 
 import catan.engine.board.Board;
 import catan.engine.board.BoardNotInitializedException;
-import catan.engine.board.objects.BoardObject;
 import catan.engine.board.objects.BoardObjectNotInitializedException;
 import catan.engine.board.objects.InvalidLocationException;
 import catan.engine.board.objects.buildings.Road;
-import catan.engine.board.objects.buildings.Village;
 import catan.engine.player.Player;
 import catan.engine.player.PlayerColor;
 import catan.engine.player.PlayerCountOutOfBoundsException;
 import catan.engine.player.PlayerIndexOutOfBoundsException;
-import catan.engine.resources.ResourceBundle;
 import catan.renderer.panel.BoardPanel;
+import catan.renderer.window.boardbuilder.BoardBuilderWindow;
+import catan.renderer.window.construction.ConstructionToolBox;
 
 /**
  * Jacob Klimczak
@@ -43,11 +42,13 @@ public class Catan {
 	public static final int MIN_PLAYERS = 2;
 	public static final int MAX_PLAYERS = 5;
 	public static final int NORMAL_PLAYERS = 4;
-	
+
 	public static final int STARTING_RESOURCES = 7;
 
 	private Player[] m_players;
 	private Board m_board;
+	private BoardPanel m_boardPanel;
+	private ConstructionToolBox m_toolBox;
 	private int m_playerIndex = -1;
 
 	/**
@@ -140,6 +141,24 @@ public class Catan {
 	}
 
 	/**
+	 * 
+	 * @return the {@link BoardPanel} for this game
+	 */
+	public BoardPanel getBoardPanel() {
+		return m_boardPanel;
+	}
+
+	/**
+	 * Sets the {@link BoardPanel} for this game
+	 * 
+	 * @param panel
+	 *            the {@link BoardPanel} to assign
+	 */
+	public void setBoardPanel(BoardPanel panel) {
+		m_boardPanel = panel;
+	}
+
+	/**
 	 * Sets the {@link Board} for this game
 	 * 
 	 * @param board
@@ -149,54 +168,47 @@ public class Catan {
 		m_board = board;
 	}
 
+	/**
+	 * Creates a new {@link ConstructionToolBox} for this game
+	 */
+	public void createToolBox() {
+		m_toolBox = new ConstructionToolBox(this);
+	}
+
+	/**
+	 * Destroys the {@link ConstructionToolBox} for this game
+	 */
+	public void destroyToolBox() {
+		if (m_toolBox != null) {
+			m_toolBox.dispose();
+		}
+		m_toolBox = null;
+	}
+
 	public static void main(String[] args) throws PlayerCountOutOfBoundsException, PlayerIndexOutOfBoundsException,
 			BoardNotInitializedException, BoardObjectNotInitializedException, InvalidLocationException {
-		
+
 		Catan catan = new Catan();
-		
+
 		catan.setBoard(Board.randomLandBoard());
 
 		catan.getBoard().addObject(
 				new Road(catan.getPlayer(), catan.getBoard().getEdge(new int[] { 1, 2 }, new int[] { 1, 1 }), true));
 		catan.getBoard().addObject(
 				new Road(catan.getPlayer(), catan.getBoard().getEdge(new int[] { 1, 2 }, new int[] { 2, 2 })));
-		
-		JFrame frame = new JFrame("Catan");
 
-		frame.getContentPane().add(new BoardPanel(catan.getBoard()) {
-			{
-				setPreSelection(true);
-				setSelectVertex(true);
-				setSelectObject(true);
-				setOnObjectSelectedListener((object) -> {
-					if (object instanceof Village) {
-						try {
-							setSelectedObject(((Village) object).upgrade());
-						} catch (InvalidLocationException e) {
-							e.printStackTrace();
-							System.exit(0);
-						}
-					}
-				});
-				setOnVertexSelectedListener((row, col) -> {
-					try {
-						BoardObject[] objects = getBoard().getAllObjectsMatching((object) -> {
-							try {
-								return object.getPosition().equals(getBoard().getVertex(row, col));
-							} catch (BoardObjectNotInitializedException e) {
-								e.printStackTrace();
-								System.exit(0);
-								return false;
-							}
-						});
-						if (objects.length == 0) {
-							getBoard().addObject(new Village(catan.getPlayer(), getBoard().getVertex(row, col)));
-						}
-					} catch (InvalidLocationException e) {
-					}
-				});
+		JFrame frame = new JFrame("Catan") {
+			@Override
+			public void dispose() {
+				super.dispose();
+				catan.destroyToolBox();
 			}
-		});
+		};
+
+		catan.setBoardPanel(new BoardPanel(catan.getBoard()));
+
+		frame.getContentPane().add(catan.getBoardPanel());
+
 		frame.pack();
 
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -207,6 +219,11 @@ public class Catan {
 
 		frame.setVisible(true);
 
+		catan.createToolBox();
+
 		// new BoardBuilderWindow();
+
+		// new ResourceMetricWindow(new ResourceMetric(new int[] {1, 1, 5, 7,
+		// 6}), "Player Metric");
 	}
 }

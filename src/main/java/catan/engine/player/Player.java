@@ -1,7 +1,9 @@
 package catan.engine.player;
 
+import catan.engine.board.Board;
 import catan.engine.resources.Purchase;
 import catan.engine.resources.ResourceBundle;
+import catan.engine.resources.ResourceMetric;
 
 /**
  * Class representing a single player (can be user or opponent)
@@ -12,7 +14,7 @@ import catan.engine.resources.ResourceBundle;
 public class Player {
 
 	private PlayerColor m_color;
-	private ResourceBundle m_resources = new ResourceBundle();
+	private ResourceBundle m_resources = new ResourceBundle(10, 10, 10, 10, 10);
 
 	/**
 	 * Creates a player with the specified color
@@ -40,10 +42,23 @@ public class Player {
 	public ResourceBundle getResources() {
 		return m_resources;
 	}
-	
+
+	/**
+	 * 
+	 * @param board
+	 *            the {@link Board} to get for
+	 * @return this {@link Player}'s production {@link ResourceMetric} on the
+	 *         specified {@link Board}
+	 */
+	public ResourceMetric getProductionMetric(Board board) {
+		return new ResourceMetric(board, this);
+	}
+
 	/**
 	 * {@link Player} attempts to buy the specified item
-	 * @param purchase the {@link Purchase} to buy
+	 * 
+	 * @param purchase
+	 *            the {@link Purchase} to buy
 	 * @return true if the {@link Purchase} was competed successfully
 	 */
 	public boolean buy(Purchase purchase) {

@@ -53,7 +53,7 @@ public class Village extends VertexObject implements Productive {
 				BufferedImage.TYPE_INT_RGB) {
 			{
 				Graphics2D g2D = createGraphics();
-				g2D.setColor(new Color(155, 155, 155));
+				g2D.setColor(new Color(200, 200, 200));
 				g2D.fillRect(0, 0, getWidth(), getHeight());
 			}
 		}, ignoreLocation);
@@ -281,10 +281,10 @@ public class Village extends VertexObject implements Productive {
 	@Override
 	public void giveResourcesToOwner(int frequency) throws TileNotInitializedException, BoardNotInitializedException,
 			VertexNotInitializedException, BoardObjectNotInitializedException, NoOwnerException {
-		if (m_owner == null) {
+		if (getOwner() == null) {
 			throw new NoOwnerException(this);
 		}
-		m_owner.getResources().add(getResources(frequency));
+		getOwner().getResources().add(getResources(frequency));
 	}
 
 	/**

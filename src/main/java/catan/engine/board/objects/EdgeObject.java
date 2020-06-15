@@ -21,8 +21,6 @@ import catan.engine.player.Player;
  */
 public abstract class EdgeObject extends BoardObject<Edge> {
 
-	protected Player m_owner = null;
-
 	/**
 	 * Creates a new {@link EdgeObject}
 	 * 
@@ -153,9 +151,9 @@ public abstract class EdgeObject extends BoardObject<Edge> {
 		}
 
 		// color image if possible
-		if (m_owner != null) {
+		if (getOwner() != null) {
 			Graphics2D g2D = m_image.createGraphics();
-			g2D.setColor(m_owner.getColor().getColor());
+			g2D.setColor(getOwner().getColor().getColor());
 			g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.25f));
 			g2D.fillRect(0, 0, m_image.getWidth(), m_image.getHeight());
 		}
