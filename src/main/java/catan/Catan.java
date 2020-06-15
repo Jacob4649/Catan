@@ -13,11 +13,11 @@ import catan.engine.board.objects.BoardObjectNotInitializedException;
 import catan.engine.board.objects.InvalidLocationException;
 import catan.engine.board.objects.buildings.Road;
 import catan.engine.board.objects.buildings.Village;
-import catan.engine.moves.Move;
 import catan.engine.player.Player;
 import catan.engine.player.PlayerColor;
 import catan.engine.player.PlayerCountOutOfBoundsException;
 import catan.engine.player.PlayerIndexOutOfBoundsException;
+import catan.engine.resources.ResourceBundle;
 import catan.renderer.panel.BoardPanel;
 
 /**
@@ -43,6 +43,8 @@ public class Catan {
 	public static final int MIN_PLAYERS = 2;
 	public static final int MAX_PLAYERS = 5;
 	public static final int NORMAL_PLAYERS = 4;
+	
+	public static final int STARTING_RESOURCES = 7;
 
 	private Player[] m_players;
 	private Board m_board;
@@ -149,10 +151,9 @@ public class Catan {
 
 	public static void main(String[] args) throws PlayerCountOutOfBoundsException, PlayerIndexOutOfBoundsException,
 			BoardNotInitializedException, BoardObjectNotInitializedException, InvalidLocationException {
-
-		// start catan game
+		
 		Catan catan = new Catan();
-
+		
 		catan.setBoard(Board.randomLandBoard());
 
 		catan.getBoard().addObject(

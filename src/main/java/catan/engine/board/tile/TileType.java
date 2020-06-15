@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Stack;
 
 import catan.engine.board.Board;
+import catan.engine.resources.ResourceBundle;
 import catan.renderer.Colors;
 import catan.renderer.panel.BoardPanel;
 
@@ -20,21 +21,28 @@ import catan.renderer.panel.BoardPanel;
  *
  */
 public enum TileType {
-	DESERT(0, getBufferedImageOfColor(Colors.DESERT_COLOR)), FOREST(1,
-			getBufferedImageOfColor(Colors.FOREST_COLOR)), PASTURE(2,
-					getBufferedImageOfColor(Colors.PASTURE_COLOR)), CLAY(3,
-							getBufferedImageOfColor(Colors.CLAY_COLOR)), FIELD(4,
-									getBufferedImageOfColor(Colors.FIELD_COLOR)), QUARRY(5,
-											getBufferedImageOfColor(Colors.QUARRY_COLOR)), COAST(6,
-													getBufferedImageOfColor(Colors.COAST_COLOR)), OCEAN(7,
-															getBufferedImageOfColor(Colors.OCEAN_COLOR));
+
+	// @formatter:off
+	
+	DESERT(0, ResourceBundle.NULL, getBufferedImageOfColor(Colors.DESERT_COLOR)), 
+	FOREST(1, ResourceBundle.WOOD, getBufferedImageOfColor(Colors.FOREST_COLOR)), 
+	PASTURE(2, ResourceBundle.SHEEP, getBufferedImageOfColor(Colors.PASTURE_COLOR)), 
+	CLAY(3, ResourceBundle.CLAY, getBufferedImageOfColor(Colors.CLAY_COLOR)), 
+	FIELD(4, ResourceBundle.GRAIN, getBufferedImageOfColor(Colors.FIELD_COLOR)), 
+	QUARRY(5, ResourceBundle.STONE, getBufferedImageOfColor(Colors.QUARRY_COLOR)), 
+	COAST(6, ResourceBundle.NULL, getBufferedImageOfColor(Colors.COAST_COLOR)), 
+	OCEAN(7, ResourceBundle.NULL, getBufferedImageOfColor(Colors.OCEAN_COLOR));
+
+	// @formatter:on
 
 	private int m_value;
+	private int m_resource;
 	private BufferedImage m_image;
 	private BufferedImage m_shownImage;
 
-	private TileType(int value, BufferedImage image) {
+	private TileType(int value, int resource, BufferedImage image) {
 		m_value = value;
+		m_resource = resource;
 		m_image = image;
 		m_shownImage = m_image;
 	}
@@ -43,10 +51,14 @@ public enum TileType {
 		return m_value;
 	}
 
+	public int getResource() {
+		return m_resource;
+	}
+
 	public BufferedImage getBaseImage() {
 		return m_image;
 	}
-	
+
 	public BufferedImage getImage() {
 		return m_shownImage;
 	}
@@ -112,6 +124,23 @@ public enum TileType {
 	}
 
 	/**
+	 * Gets the {@link TileType} with the specified resource
+	 * 
+	 * @param i
+	 *            the resource
+	 * @return the {@link TileType} with a resource of i, null if no
+	 *         {@link TileType} has the desired resource
+	 */
+	public static TileType getWithResource(int i) {
+		for (TileType type : TileType.values()) {
+			if (type.getResource() == i) {
+				return type;
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Gets a specific number of evenly distributed {@link TileType}s
 	 * 
 	 * @param number
@@ -166,11 +195,11 @@ public enum TileType {
 		int arrayIndex = 0;
 
 		int length = TileType.values().length - exclude.length;
-		
+
 		TileType[] values = new TileType[length];
-		
+
 		int assigning = 0;
-		
+
 		for (int i = 0; i < length; i++) {
 			if (Arrays.asList(exclude).contains(TileType.values()[i])) {
 				continue;
@@ -178,7 +207,7 @@ public enum TileType {
 			values[assigning] = TileType.values()[i];
 			assigning++;
 		}
-		
+
 		for (int i = 0; i < number / length; i++) {
 			for (int j = 0; j < length; j++) {
 				types[arrayIndex] = values[j];
@@ -205,5 +234,10 @@ public enum TileType {
 		}
 
 		return types;
+	}
+
+	@Override
+	public String toString() {
+		return "TileType: (" + super.toString() + ")";
 	}
 }

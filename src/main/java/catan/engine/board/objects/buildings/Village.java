@@ -20,6 +20,7 @@ import catan.engine.board.tile.Vertex;
 import catan.engine.board.tile.VertexNotInitializedException;
 import catan.engine.player.Player;
 import catan.engine.resources.ResourceBundle;
+import catan.engine.resources.ResourceMetric;
 import catan.renderer.panel.BoardPanel;
 
 /**
@@ -127,7 +128,7 @@ public class Village extends VertexObject implements Productive {
 						map[((Vertex) object.getPosition()).getPosition()[0]][((Vertex) object.getPosition())
 								.getPosition()[1]] = 2;
 					}
-					
+
 					if (((Vertex) object.getPosition()).getPosition()[0] + 1 >= 0
 							&& ((Vertex) object.getPosition()).getPosition()[0] + 1 < board.getVertexDimensions()[0]
 							&& ((Vertex) object.getPosition()).getPosition()[1] >= 0
@@ -136,7 +137,7 @@ public class Village extends VertexObject implements Productive {
 						map[((Vertex) object.getPosition()).getPosition()[0] + 1][((Vertex) object.getPosition())
 								.getPosition()[1]] = 2;
 					}
-					
+
 					if (((Vertex) object.getPosition()).getPosition()[0] - 1 >= 0
 							&& ((Vertex) object.getPosition()).getPosition()[0] < board.getVertexDimensions()[0]
 							&& ((Vertex) object.getPosition()).getPosition()[1] >= 0
@@ -145,23 +146,23 @@ public class Village extends VertexObject implements Productive {
 						map[((Vertex) object.getPosition()).getPosition()[0] - 1][((Vertex) object.getPosition())
 								.getPosition()[1]] = 2;
 					}
-					
+
 					if (((Vertex) object.getPosition()).getPosition()[0] >= 0
 							&& ((Vertex) object.getPosition()).getPosition()[0] < board.getVertexDimensions()[0]
 							&& ((Vertex) object.getPosition()).getPosition()[1] + 1 >= 0
 							&& ((Vertex) object.getPosition()).getPosition()[1] + 1 < board.getVertexDimensions()[1]) {
 						// if valid vertex
 						map[((Vertex) object.getPosition()).getPosition()[0]][((Vertex) object.getPosition())
-								.getPosition()[1] + 1 ] = 2;
+								.getPosition()[1] + 1] = 2;
 					}
-					
+
 					if (((Vertex) object.getPosition()).getPosition()[0] >= 0
 							&& ((Vertex) object.getPosition()).getPosition()[0] < board.getVertexDimensions()[0]
 							&& ((Vertex) object.getPosition()).getPosition()[1] - 1 >= 0
 							&& ((Vertex) object.getPosition()).getPosition()[1] - 1 < board.getVertexDimensions()[1]) {
 						// if valid vertex
 						map[((Vertex) object.getPosition()).getPosition()[0]][((Vertex) object.getPosition())
-								.getPosition()[1] - 1 ] = 2;
+								.getPosition()[1] - 1] = 2;
 					}
 				}
 			} catch (VertexNotInitializedException | BoardObjectNotInitializedException | BoardNotInitializedException
@@ -235,7 +236,8 @@ public class Village extends VertexObject implements Productive {
 	}
 
 	/**
-	 * 
+	 * @param frequency
+	 *            the int frequency of this turn
 	 * @return {@link ResourceBundle} containing all resources this
 	 *         {@link Village} produces in a turn
 	 * @throws BoardObjectNotInitializedException
@@ -249,11 +251,11 @@ public class Village extends VertexObject implements Productive {
 	 *             if any {@link Tile}s have not been initialized
 	 */
 	@Override
-	public ResourceBundle getResources() throws TileNotInitializedException, BoardNotInitializedException,
+	public ResourceBundle getResources(int frequency) throws TileNotInitializedException, BoardNotInitializedException,
 			VertexNotInitializedException, BoardObjectNotInitializedException {
 		ResourceBundle bundle = new ResourceBundle();
 		for (Tile tile : getPosition().getAdjacentTiles()) {
-			bundle.add(tile.getResources(VILLAGE_PRODUCTIVITY));
+			bundle.add(tile.getResources(VILLAGE_PRODUCTIVITY, frequency));
 		}
 		return bundle;
 	}
@@ -262,6 +264,8 @@ public class Village extends VertexObject implements Productive {
 	 * Adds all resources produced by this {@link Village} to the owning
 	 * {@link Player}'s {@link ResourceBundle}
 	 * 
+	 * @param frequency
+	 *            the int frequency of this turn
 	 * @throws BoardObjectNotInitializedException
 	 *             if this {@link Village} has not been initialized
 	 * @throws VertexNotInitializedException
@@ -275,12 +279,42 @@ public class Village extends VertexObject implements Productive {
 	 *             if this {@link Village} is not owned by an {@link Player}
 	 */
 	@Override
-	public void giveResourcesToOwner() throws TileNotInitializedException, BoardNotInitializedException,
+	public void giveResourcesToOwner(int frequency) throws TileNotInitializedException, BoardNotInitializedException,
 			VertexNotInitializedException, BoardObjectNotInitializedException, NoOwnerException {
 		if (m_owner == null) {
 			throw new NoOwnerException(this);
 		}
-		m_owner.getResources().add(getResources());
+		m_owner.getResources().add(getResources(frequency));
+	}
+
+	/**
+	 * 
+	 * @return {@link ResourceMetric} for this {@link Village}
+	 * @throws BoardObjectNotInitializedException
+	 *             if this {@link Village} has not been initialized
+	 * @throws VertexNotInitializedException
+	 *             if the {@link Vertex} this {@link Village} is on has not been
+	 *             initialized
+	 * @throws BoardNotInitializedException
+	 *             if the {@link Board} this {@link Village} is on has not been
+	 *             initialized
+	 * @throws TileNotInitializedException
+	 *             if any {@link Tile}s surrounding this {@link Village} have
+	 *             not been initialized
+	 */
+	@Override
+	public ResourceMetric getMetric() throws TileNotInitializedException, BoardNotInitializedException,
+			VertexNotInitializedException, BoardObjectNotInitializedException {
+
+		int[] metric = new int[ResourceBundle.RESOURCE_NUMBER];
+
+		for (Tile tile : getPosition().getAdjacentTiles()) {
+			if (tile.getTileType().getResource() != ResourceBundle.NULL) {
+				metric[tile.getTileType().getResource()] += VILLAGE_PRODUCTIVITY * Tile.getFrequencyProbability(tile.getFrequency());
+			}
+		}
+
+		return new ResourceMetric(metric);
 	}
 
 	/**

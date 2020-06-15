@@ -13,6 +13,9 @@ public class ResourceBundle {
 	public static final int STONE = 2;
 	public static final int GRAIN = 3;
 	public static final int SHEEP = 4;
+	public static final int NULL = 5;
+
+	public static final int RESOURCE_NUMBER = 5;
 
 	private int m_wood = 0;
 	private int m_clay = 0;
@@ -125,6 +128,24 @@ public class ResourceBundle {
 	}
 
 	/**
+	 * Adds the specified number of random resources to this
+	 * {@link ResourceBundle}
+	 * 
+	 * @param number
+	 *            the number of resources to add
+	 * @return the calling {@link ResourceBundle}
+	 */
+	public ResourceBundle addRandom(int number) {
+		for (int i = 0; i < number; i++) {
+			int j = (int) (Math.random() * RESOURCE_NUMBER);
+			int[] resources = new int[RESOURCE_NUMBER];
+			resources[j] = 1;
+			add(new ResourceBundle(resources));
+		}
+		return this;
+	}
+
+	/**
 	 * Adds the specified {@link ResourceBundle} to this {@link ResourceBundle}
 	 * 
 	 * @param bundle
@@ -169,5 +190,11 @@ public class ResourceBundle {
 	public boolean greaterOrEqualTo(ResourceBundle bundle) {
 		return getWood() >= bundle.getWood() && getClay() >= bundle.getClay() && getGrain() >= bundle.getGrain()
 				&& getStone() >= bundle.getStone() && getSheep() >= bundle.getSheep();
+	}
+
+	@Override
+	public String toString() {
+		return "ResourceBundle: (Wood: (" + getWood() + "), Clay: (" + getClay() + "), Stone: (" + getStone()
+				+ "), Grain: (" + getGrain() + "), Sheep: (" + getSheep() + "))";
 	}
 }

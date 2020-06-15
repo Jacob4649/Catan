@@ -24,6 +24,8 @@ public class Tile {
 	public static final int FREQUENCY_MIN = 2;
 	public static final int FREQUENCY_MAX = 12;
 
+	private static final int[] FREQUENCY_DISTRIBUTION = new int[] { 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1 };
+
 	private int m_frequency = -1;
 	private TileType m_type;
 
@@ -58,6 +60,18 @@ public class Tile {
 		} else {
 			throw new TileNotInitializedException();
 		}
+	}
+
+	/**
+	 * Gets the number of ways two dice can produce the specified frequency
+	 * 
+	 * @param frequency
+	 *            the frequency you wish to find the probability for
+	 * @return the number of dice combinations that produce the specified
+	 *         frequency
+	 */
+	public static int getFrequencyProbability(int frequency) {
+		return FREQUENCY_DISTRIBUTION[frequency + FREQUENCY_MIN];
 	}
 
 	/**
@@ -184,6 +198,27 @@ public class Tile {
 		}
 
 		return m_image;
+	}
+
+	/**
+	 * 
+	 * @param num
+	 *            the number of resources to produce from this {@link Tile}
+	 * @param frequency
+	 *            the frequency of the turn
+	 * @return a {@link ResourceBundle} containing the specified amount of
+	 *         resources this tile produces
+	 */
+	public ResourceBundle getResources(int num, int frequency) {
+		try {
+			if (frequency == getFrequency()) {
+				return getResources(num);
+			}
+		} catch (TileNotInitializedException e) {
+			e.printStackTrace();
+			System.exit(0);
+		}
+		return new ResourceBundle();
 	}
 
 	/**
