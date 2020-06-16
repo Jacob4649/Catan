@@ -31,7 +31,8 @@ import catan.renderer.panel.BoardPanel;
  */
 public class City extends VertexObject implements Productive {
 
-	private static final int CITY_PRODUCTIVITY = 2;
+	private static final int PRODUCTIVITY = 2;
+	public static final int VICTORY_POINTS = 2;
 
 	/**
 	 * Creates a {@link City}
@@ -116,7 +117,8 @@ public class City extends VertexObject implements Productive {
 	public static boolean isValidLocation(Vertex vertex, Player owner) {
 		return vertex.getBoard().getAllObjectsMatching((object) -> {
 			try {
-				return object instanceof Village && ((Village) object).getPosition().equals(vertex);
+				return object instanceof Village && ((Village) object).getPosition().equals(vertex)
+						&& object.getOwner() == owner;
 			} catch (BoardObjectNotInitializedException e) {
 				e.printStackTrace();
 				System.exit(0);
@@ -181,7 +183,7 @@ public class City extends VertexObject implements Productive {
 			VertexNotInitializedException, BoardObjectNotInitializedException {
 		ResourceBundle bundle = new ResourceBundle();
 		for (Tile tile : getPosition().getAdjacentTiles()) {
-			bundle.add(tile.getResources(CITY_PRODUCTIVITY, frequency));
+			bundle.add(tile.getResources(PRODUCTIVITY, frequency));
 		}
 		return bundle;
 	}
@@ -236,7 +238,8 @@ public class City extends VertexObject implements Productive {
 
 		for (Tile tile : getPosition().getAdjacentTiles()) {
 			if (tile.getTileType().getResource() != ResourceBundle.NULL) {
-				metric[tile.getTileType().getResource()] += CITY_PRODUCTIVITY * Tile.getFrequencyProbability(tile.getFrequency());
+				metric[tile.getTileType().getResource()] += PRODUCTIVITY
+						* Tile.getFrequencyProbability(tile.getFrequency());
 			}
 		}
 

@@ -6,7 +6,6 @@ import catan.Catan;
 import catan.engine.board.objects.BoardObject;
 import catan.engine.board.objects.BoardObjectConsumer;
 import catan.engine.board.objects.BoardObjectMatcher;
-import catan.engine.board.objects.BoardObjectNotInitializedException;
 import catan.engine.board.objects.InvalidLocationException;
 import catan.engine.board.objects.buildings.City;
 import catan.engine.board.objects.buildings.Road;
@@ -23,6 +22,8 @@ import catan.engine.moves.Move;
 import catan.engine.moves.PurchaseMove;
 import catan.engine.player.Player;
 import catan.engine.resources.PurchaseCosts;
+import catan.engine.resources.ResourceBundle;
+import catan.engine.resources.ResourceMetric;
 
 /**
  * Class representing the board for a game of {@link Catan} Tile positions are
@@ -332,7 +333,8 @@ public class Board {
 	 * @return array containing the {@link Move}s
 	 * @throws BoardNotInitializedException
 	 *             if this {@link Board} has not been initialized
-	 * @throws InvalidLocationException if location supplied to any {@link Move} is invalid
+	 * @throws InvalidLocationException
+	 *             if location supplied to any {@link Move} is invalid
 	 */
 	public Move[] getMovesForPlayer(Player player) throws BoardNotInitializedException, InvalidLocationException {
 		ArrayList<Move> moves = new ArrayList<Move>();
@@ -355,10 +357,118 @@ public class Board {
 				moves.add(new PurchaseMove(new ConstructRoad(new Road(player, edge)), player));
 			}
 		}
-		
+
 		Move[] output = new Move[moves.size()];
 		output = moves.toArray(output);
 		return output;
+	}
+
+	/**
+	 * 
+	 * @param gameStage
+	 *            the highest number of victory points any player possesses
+	 * @param row
+	 *            the row of the {@link Tile}
+	 * @param col
+	 *            the column of the {@link Tile}
+	 * @param metric
+	 *            the production metric to assess this {@link Tile} based off of
+	 * @return the unitless value of this {@link Tile}
+	 * @throws TileNotInitializedException
+	 *             if the specified {@link Tile} has not been initialized
+	 */
+	public int getTileValue(int gameStage, int row, int col, ResourceMetric metric) throws TileNotInitializedException {
+		Tile tile = getTileAt(row, col);
+
+		int[] weights = new int[ResourceBundle.RESOURCE_NUMBER];
+
+		// mid game, roads, villages, cities
+
+		for (int i = 0; i < ResourceBundle.RESOURCE_NUMBER; i++) {
+			weights[i] = 7;
+		}
+
+		if (gameStage < 4) {
+
+			// early game, roads, villages
+
+			weights[ResourceBundle.WOOD] += 1;
+			weights[ResourceBundle.CLAY] += 1;
+			weights[ResourceBundle.STONE] -= 1;
+
+		} else if (gameStage > 6) {
+
+			// late game, cities, wild cards
+
+			weights[ResourceBundle.WOOD] -= 1;
+			weights[ResourceBundle.CLAY] -= 1;
+
+		}
+		
+		int resource = tile.getTileType().getResource();
+		
+		if (resource == ResourceBundle.NULL) {
+			return 0;
+		}
+		
+		int prodDiff = (gameStage / 2) - metric.getRawMetric()[resource];
+
+		int weighted = weights[resource] * Tile.getFrequencyProbability(tile.getFrequency());
+		
+		return weighted + prodDiff;
+	}
+
+	/**
+	 * @param row
+	 *            the row of the {@link Tile}
+	 * @param col
+	 *            the column of the {@link Tile}
+	 * @param metric
+	 *            the production metric to assess this {@link Tile} based off of
+	 * @return the unitless value of this {@link Tile}
+	 * @throws TileNotInitializedException
+	 *             if the specified {@link Tile} has not been initialized
+	 */
+	public int getTileValue(int row, int col, ResourceMetric metric) throws TileNotInitializedException {
+		return getTileValue(getHighestVictoryPoints(), row, col, metric);
+	}
+
+	/**
+	 * 
+	 * @return the highest number of victory points possessed by any
+	 *         {@link Player} on this {@link Board}
+	 */
+	public int getHighestVictoryPoints() {
+		ArrayList<Player> players = new ArrayList<Player>();
+		ArrayList<Integer> points = new ArrayList<Integer>();
+
+		for (BoardObject object : getObjects()) {
+			if (object.getOwner() != null) {
+				int index = -1;
+				if (!players.contains(object)) {
+					index = players.size();
+					players.add(object.getOwner());
+					points.add(0);
+				}
+				if (object instanceof Village) {
+					if (index == -1) {
+						index = players.indexOf(object.getOwner());
+					}
+					points.set(index, points.get(index) + Village.VICTORY_POINTS);
+				} else if (object instanceof City) {
+					if (index == -1) {
+						index = players.indexOf(object.getOwner());
+					}
+					points.set(index, points.get(index) + City.VICTORY_POINTS);
+				}
+			}
+		}
+
+		int max = 0;
+		for (Integer i : points) {
+			max = Math.max(max, i);
+		}
+		return max;
 	}
 
 	@Override

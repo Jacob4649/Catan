@@ -47,7 +47,12 @@ public abstract class BoardObject<T> {
 		m_owner = owner;
 		m_baseImages.addImage(baseImage, getClass());
 		if (!validLocation() && !ignoreLocation) {
-			throw new InvalidLocationException();
+			try {
+				throw new InvalidLocationException(this);
+			} catch (BoardObjectNotInitializedException e) {
+				e.printStackTrace();
+				System.exit(0);
+			}
 		}
 
 	}

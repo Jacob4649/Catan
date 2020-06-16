@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import catan.engine.board.Board;
 import catan.engine.board.BoardNotInitializedException;
+import catan.engine.resources.ResourceMetric;
 
 /**
  * Class representing a vertex on the {@link Catan} {@link Board}
@@ -46,6 +47,59 @@ public class Vertex {
 			throw new VertexNotInitializedException();
 		}
 		return new int[] { m_row, m_column };
+	}
+
+	/**
+	 * 
+	 * @param gameStage
+	 *            the highest number of victory points any player possesses
+	 * @param metric
+	 *            the production metric to assess this {@link Vertex} based off
+	 *            of
+	 * @return the unitless value of this {@link Vertex}
+	 * @throws TileNotInitializedException
+	 *             if the specified {@link Tile} has not been initialized
+	 * @throws VertexNotInitializedException
+	 *             if this {@link Vertex} has not been initialized
+	 */
+	public int getVertexValue(int gameStage, ResourceMetric metric)
+			throws TileNotInitializedException, VertexNotInitializedException {
+		if (m_row == -1 || m_column == -1) {
+			throw new VertexNotInitializedException();
+		}
+		int sum = 0;
+		try {
+			sum += getBoard().getTileValue(gameStage, m_row, m_column, metric);
+		} catch (ArrayIndexOutOfBoundsException e) {
+		}
+		try {
+			sum += getBoard().getTileValue(gameStage, m_row - 1, m_column, metric);
+		} catch (ArrayIndexOutOfBoundsException e) {
+		}
+		try {
+			sum += getBoard().getTileValue(gameStage, m_row, m_column - 1, metric);
+		} catch (ArrayIndexOutOfBoundsException e) {
+		}
+		try {
+			sum += getBoard().getTileValue(gameStage, m_row - 1, m_column - 1, metric);
+		} catch (ArrayIndexOutOfBoundsException e) {
+		}
+		return sum;
+	}
+
+	/**
+	 *
+	 * @param metric
+	 *            the production metric to assess this {@link Vertex} based off
+	 *            of
+	 * @return the unitless value of this {@link Vertex}
+	 * @throws TileNotInitializedException
+	 *             if the specified {@link Tile} has not been initialized
+	 * @throws VertexNotInitializedException
+	 *             if this {@link Vertex} has not been initialized
+	 */
+	public int getVertexValue(ResourceMetric metric) throws TileNotInitializedException, VertexNotInitializedException {
+		return getVertexValue(getBoard().getHighestVictoryPoints(), metric);
 	}
 
 	/**

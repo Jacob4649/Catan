@@ -31,7 +31,8 @@ import catan.renderer.panel.BoardPanel;
  */
 public class Village extends VertexObject implements Productive {
 
-	private static final int VILLAGE_PRODUCTIVITY = 1;
+	private static final int PRODUCTIVITY = 1;
+	public static final int VICTORY_POINTS = 1;
 
 	/**
 	 * Creates a {@link Village}
@@ -101,7 +102,7 @@ public class Village extends VertexObject implements Productive {
 	 *             if the {@link Board} has not been initialized
 	 */
 	public static Vertex[] getValidLocations(Board board, Player owner) throws BoardNotInitializedException {
-		int[][] map = new int[board.getDimensions()[0]][board.getDimensions()[1]];
+		int[][] map = new int[board.getVertexDimensions()[0]][board.getVertexDimensions()[1]];
 
 		board.forAllObjects((object) -> {
 			try {
@@ -255,7 +256,7 @@ public class Village extends VertexObject implements Productive {
 			VertexNotInitializedException, BoardObjectNotInitializedException {
 		ResourceBundle bundle = new ResourceBundle();
 		for (Tile tile : getPosition().getAdjacentTiles()) {
-			bundle.add(tile.getResources(VILLAGE_PRODUCTIVITY, frequency));
+			bundle.add(tile.getResources(PRODUCTIVITY, frequency));
 		}
 		return bundle;
 	}
@@ -310,7 +311,7 @@ public class Village extends VertexObject implements Productive {
 
 		for (Tile tile : getPosition().getAdjacentTiles()) {
 			if (tile.getTileType().getResource() != ResourceBundle.NULL) {
-				metric[tile.getTileType().getResource()] += VILLAGE_PRODUCTIVITY * Tile.getFrequencyProbability(tile.getFrequency());
+				metric[tile.getTileType().getResource()] += PRODUCTIVITY * Tile.getFrequencyProbability(tile.getFrequency());
 			}
 		}
 

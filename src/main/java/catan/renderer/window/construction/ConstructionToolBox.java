@@ -60,7 +60,7 @@ public class ConstructionToolBox extends JFrame {
 			System.exit(0);
 		}
 	};
-	
+
 	private final Runnable m_deselect = () -> {
 		m_selectedTile.setText("None");
 		m_catan.getBoardPanel().setOnTileSelectedListener(m_updateSelection);
@@ -84,13 +84,35 @@ public class ConstructionToolBox extends JFrame {
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
 		setBounds(BoardPanel.PANEL_HORIZONTAL + 55, 0, HORIZONTAL, VERTICAL);
-
-		setResizable(false);
 		
+		setResizable(false);
+
 		m_panel = new JPanel();
 		JScrollPane scrollPane = new JScrollPane(m_panel);
 
 		m_panel.setLayout(new BoxLayout(m_panel, BoxLayout.Y_AXIS));
+
+		m_panel.add(new JLabel("Player") {
+			{
+				setFont(new Font("Tahoma", Font.BOLD, 18));
+				setAlignmentX(Component.CENTER_ALIGNMENT);
+				setAlignmentY(Component.CENTER_ALIGNMENT);
+			}
+		});
+		
+		m_panel.add(Box.createVerticalStrut(20));
+		
+		String color = catan.getPlayer().getColor().toString().toLowerCase();
+		color = color.substring(0, 1).toUpperCase() + color.substring(1);
+		m_panel.add(new JLabel("Player Is " + color + " ") {
+			{
+				setFont(new Font("Tahoma", Font.ITALIC, 11));
+				setAlignmentX(Component.CENTER_ALIGNMENT);
+				setAlignmentY(Component.CENTER_ALIGNMENT);
+			}
+		});
+		
+		m_panel.add(Box.createVerticalStrut(20));
 		
 		m_panel.add(new JLabel("Resources") {
 			{
@@ -131,7 +153,7 @@ public class ConstructionToolBox extends JFrame {
 		updateResources();
 
 		m_panel.add(Box.createVerticalStrut(20));
-		
+
 		m_panel.add(new JLabel("Selected") {
 			{
 				setFont(new Font("Tahoma", Font.BOLD, 18));
@@ -178,7 +200,7 @@ public class ConstructionToolBox extends JFrame {
 		});
 
 		m_panel.add(Box.createVerticalStrut(20));
-		
+
 		m_selectGroup.add((JToggleButton) m_panel.add(new JToggleButton("Build Road") {
 			{
 				setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -200,6 +222,7 @@ public class ConstructionToolBox extends JFrame {
 									if (Road.isValidLocation(location, catan.getPlayer())) {
 										new PurchaseMove(new ConstructRoad(new Road(catan.getPlayer(), location)),
 												catan.getPlayer()).apply();
+										catan.syncNextTurn();
 									}
 									m_catan.getBoardPanel().deselect();
 									m_selectGroup.clearSelection();
@@ -233,6 +256,7 @@ public class ConstructionToolBox extends JFrame {
 								if (Village.isValidLocation(location, catan.getPlayer())) {
 									new PurchaseMove(new ConstructVillage(new Village(catan.getPlayer(), location)),
 											catan.getPlayer()).apply();
+									catan.syncNextTurn();
 								}
 								m_catan.getBoardPanel().deselect();
 								m_selectGroup.clearSelection();
@@ -263,6 +287,7 @@ public class ConstructionToolBox extends JFrame {
 								Vertex location = ((VertexObject) object).getPosition();
 								if (City.isValidLocation(location, catan.getPlayer())) {
 									new PurchaseMove(new UpgradeVillage((Village) object), catan.getPlayer()).apply();
+									catan.syncNextTurn();
 								}
 							}
 							m_catan.getBoardPanel().deselect();
@@ -272,6 +297,20 @@ public class ConstructionToolBox extends JFrame {
 				});
 			}
 		}));
+
+		m_panel.add(Box.createVerticalStrut(20));
+
+		m_panel.add(new JButton("End Turn") {
+			{
+				setAlignmentX(Component.CENTER_ALIGNMENT);
+				setAlignmentY(Component.CENTER_ALIGNMENT);
+				addActionListener((performedAction) -> {
+					m_catan.getBoardPanel().deselect();
+					m_selectGroup.clearSelection();
+					catan.syncNextTurn();
+				});
+			}
+		});
 
 		m_panel.add(Box.createVerticalStrut(20));
 
