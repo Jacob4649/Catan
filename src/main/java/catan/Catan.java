@@ -57,7 +57,7 @@ import catan.renderer.window.menu.MainMenu;
  * You may only build villages on roads. 
  * You may also not build a village adjacent to an existing village.
  * Roads may only be constructed with one point contacting an existing road.
- * Each player starts with 2 villages and 2 roads.
+ * Each player starts with 2 villages and 2 roads, and 7 random resources.
  * 
  * Games are played on maps composed of tiles. 
  * These maps are either randomly generated,
