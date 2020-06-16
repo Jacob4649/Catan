@@ -35,22 +35,6 @@ public class MainMenu {
 	private MapsMenu m_maps;
 
 	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					MainMenu window = new MainMenu();
-					window.m_frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
 	 * Create a new {@link MainMenu}
 	 */
 	public MainMenu() {
@@ -122,6 +106,8 @@ public class MainMenu {
 		});
 
 		m_frame.getContentPane().add(quit);
+		
+		m_frame.setVisible(true);
 	}
 
 	/**

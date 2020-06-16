@@ -84,7 +84,7 @@ public class ConstructionToolBox extends JFrame {
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
 		setBounds(BoardPanel.PANEL_HORIZONTAL + 55, 0, HORIZONTAL, VERTICAL);
-		
+
 		setResizable(false);
 
 		m_panel = new JPanel();
@@ -99,9 +99,9 @@ public class ConstructionToolBox extends JFrame {
 				setAlignmentY(Component.CENTER_ALIGNMENT);
 			}
 		});
-		
+
 		m_panel.add(Box.createVerticalStrut(20));
-		
+
 		String color = catan.getPlayer().getColor().toString().toLowerCase();
 		color = color.substring(0, 1).toUpperCase() + color.substring(1);
 		m_panel.add(new JLabel("Player Is " + color + " ") {
@@ -111,9 +111,9 @@ public class ConstructionToolBox extends JFrame {
 				setAlignmentY(Component.CENTER_ALIGNMENT);
 			}
 		});
-		
+
 		m_panel.add(Box.createVerticalStrut(20));
-		
+
 		m_panel.add(new JLabel("Resources") {
 			{
 				setFont(new Font("Tahoma", Font.BOLD, 18));
@@ -220,9 +220,10 @@ public class ConstructionToolBox extends JFrame {
 									Edge location = new Edge(new int[] { row, col }, m_selectHistory.getPosition(),
 											catan.getBoard());
 									if (Road.isValidLocation(location, catan.getPlayer())) {
-										new PurchaseMove(new ConstructRoad(new Road(catan.getPlayer(), location)),
-												catan.getPlayer()).apply();
-										catan.syncNextTurn();
+										if (new PurchaseMove(new ConstructRoad(new Road(catan.getPlayer(), location)),
+												catan.getPlayer()).apply()) {
+											catan.syncNextTurn();
+										}
 									}
 									m_catan.getBoardPanel().deselect();
 									m_selectGroup.clearSelection();
@@ -237,6 +238,14 @@ public class ConstructionToolBox extends JFrame {
 				});
 			}
 		}));
+
+		m_panel.add(new JLabel("1x Wood, 1x Clay ") {
+			{
+				setFont(new Font("Tahoma", Font.ITALIC, 11));
+				setAlignmentX(Component.CENTER_ALIGNMENT);
+				setAlignmentY(Component.CENTER_ALIGNMENT);
+			}
+		});
 
 		m_panel.add(Box.createVerticalStrut(20));
 
@@ -254,9 +263,10 @@ public class ConstructionToolBox extends JFrame {
 							try {
 								Vertex location = catan.getBoard().getVertex(row, col);
 								if (Village.isValidLocation(location, catan.getPlayer())) {
-									new PurchaseMove(new ConstructVillage(new Village(catan.getPlayer(), location)),
-											catan.getPlayer()).apply();
-									catan.syncNextTurn();
+									if (new PurchaseMove(new ConstructVillage(new Village(catan.getPlayer(), location)),
+											catan.getPlayer()).apply()) {
+										catan.syncNextTurn();
+									}
 								}
 								m_catan.getBoardPanel().deselect();
 								m_selectGroup.clearSelection();
@@ -269,6 +279,14 @@ public class ConstructionToolBox extends JFrame {
 				});
 			}
 		}));
+
+		m_panel.add(new JLabel("1x Wood, 1x Clay, 1x Sheep, 1x Grain ") {
+			{
+				setFont(new Font("Tahoma", Font.ITALIC, 11));
+				setAlignmentX(Component.CENTER_ALIGNMENT);
+				setAlignmentY(Component.CENTER_ALIGNMENT);
+			}
+		});
 
 		m_panel.add(Box.createVerticalStrut(20));
 
@@ -286,8 +304,10 @@ public class ConstructionToolBox extends JFrame {
 							if (object instanceof VertexObject) {
 								Vertex location = ((VertexObject) object).getPosition();
 								if (City.isValidLocation(location, catan.getPlayer())) {
-									new PurchaseMove(new UpgradeVillage((Village) object), catan.getPlayer()).apply();
-									catan.syncNextTurn();
+									if (new PurchaseMove(new UpgradeVillage((Village) object), catan.getPlayer())
+											.apply()) {
+										catan.syncNextTurn();
+									}
 								}
 							}
 							m_catan.getBoardPanel().deselect();
@@ -297,6 +317,14 @@ public class ConstructionToolBox extends JFrame {
 				});
 			}
 		}));
+
+		m_panel.add(new JLabel("2x Stone, 3x Grain ") {
+			{
+				setFont(new Font("Tahoma", Font.ITALIC, 11));
+				setAlignmentX(Component.CENTER_ALIGNMENT);
+				setAlignmentY(Component.CENTER_ALIGNMENT);
+			}
+		});
 
 		m_panel.add(Box.createVerticalStrut(20));
 

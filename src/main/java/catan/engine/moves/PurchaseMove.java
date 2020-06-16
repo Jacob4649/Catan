@@ -35,8 +35,8 @@ public class PurchaseMove implements Move {
 	 * Applies this {@link Purchase}
 	 */
 	@Override
-	public void apply() {
-		m_player.buy(m_purchase);
+	public boolean apply() {
+		return m_player.buy(m_purchase);
 	}
 	
 	@Override

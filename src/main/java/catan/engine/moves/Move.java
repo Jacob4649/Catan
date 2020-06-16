@@ -14,7 +14,9 @@ public interface Move {
 
 	/**
 	 * Applies this move
+	 * 
+	 * @return true if successful
 	 */
-	public void apply();
-	
+	public boolean apply();
+
 }

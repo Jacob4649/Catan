@@ -1,5 +1,6 @@
 package catan;
 
+import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,10 +27,14 @@ import catan.engine.player.Player;
 import catan.engine.player.PlayerColor;
 import catan.engine.player.PlayerCountOutOfBoundsException;
 import catan.engine.player.PlayerIndexOutOfBoundsException;
+import catan.engine.resources.PurchaseCosts;
+import catan.engine.resources.ResourceBundle;
 import catan.engine.resources.ResourceMetric;
+import catan.engine.resources.trading.TradeExchange;
 import catan.renderer.panel.BoardPanel;
 import catan.renderer.window.construction.ConstructionToolBox;
 import catan.renderer.window.construction.InitialConstructionToolBox;
+import catan.renderer.window.menu.GameOver;
 import catan.renderer.window.menu.MainMenu;
 
 /**
@@ -37,10 +42,8 @@ import catan.renderer.window.menu.MainMenu;
  * ICS4UO
  * Course Summative - Catan Game
  * 
- * Some components (such as the opponent AI) were based on my summative from last year
- * which can be found at https://github.com/Jacob4649/Chess. These components were only based
- * on last year's code, and were not directly taken from last year's summative.
- * No code was reused.
+ * All code is original.
+ * 
  */
 
 /**
@@ -57,6 +60,8 @@ public class Catan {
 	public static final int NORMAL_PLAYERS = 4;
 
 	public static final int STARTING_RESOURCES = 7;
+
+	public static final int MAX_VICTORY_POINTS = 10;
 
 	private Player[] m_players;
 	private Board m_board;
@@ -312,8 +317,16 @@ public class Catan {
 					}
 				}
 				destroyToolBox();
+				if (getPlayer().getVictoryPoints(getBoard()) >= MAX_VICTORY_POINTS) {
+					m_end = true;
+					new GameOver(this, getPlayer());
+				}
 			} else {
 				getActivePlayer().takeTurn(this);
+				if (getActivePlayer().getVictoryPoints(getBoard()) >= MAX_VICTORY_POINTS) {
+					m_end = true;
+					new GameOver(this, getActivePlayer());
+				}
 				nextTurn();
 			}
 		}
@@ -485,6 +498,8 @@ public class Catan {
 
 		catan.gameLoop();
 
+		frame.dispose();
+
 		menu.setVisible(true);
 	}
 
@@ -511,5 +526,20 @@ public class Catan {
 			throws PlayerCountOutOfBoundsException, PlayerIndexOutOfBoundsException, BoardNotInitializedException,
 			TileNotInitializedException, VertexNotInitializedException, InvalidLocationException {
 		startCatan(-1, null, menu);
+	}
+
+	/**
+	 * Launch the game
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					new MainMenu();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 }

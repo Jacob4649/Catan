@@ -1,5 +1,7 @@
 package catan.engine.resources;
 
+import java.util.Arrays;
+
 /**
  * Class representing a collection of resources
  * 
@@ -213,6 +215,14 @@ public class ResourceBundle {
 
 	/**
 	 * 
+	 * @return this {@link ResourceBundle} as an int array
+	 */
+	public int[] getRawBundle() {
+		return new int[] { getWood(), getClay(), getStone(), getGrain(), getSheep() };
+	}
+
+	/**
+	 * 
 	 * @param resource
 	 *            int resource
 	 * @return the specified int resource as a {@link String}
@@ -233,6 +243,11 @@ public class ResourceBundle {
 		case SHEEP:
 			return "Sheep";
 		}
+	}
+
+	@Override
+	public ResourceBundle clone() {
+		return new ResourceBundle(getWood(), getClay(), getStone(), getGrain(), getSheep());
 	}
 
 	@Override
