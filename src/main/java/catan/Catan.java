@@ -30,6 +30,7 @@ import catan.engine.resources.ResourceMetric;
 import catan.renderer.panel.BoardPanel;
 import catan.renderer.window.construction.ConstructionToolBox;
 import catan.renderer.window.construction.InitialConstructionToolBox;
+import catan.renderer.window.menu.MainMenu;
 
 /**
  * Jacob Klimczak
@@ -66,6 +67,8 @@ public class Catan {
 
 	private boolean m_end = false;
 
+	private MainMenu m_menu;
+
 	/**
 	 * Creates a new game of {@link Catan} with the specified players
 	 * 
@@ -90,6 +93,11 @@ public class Catan {
 
 		m_players = players;
 		m_playerIndex = playerIndex;
+
+		// add starting resources
+		for (Player player : m_players) {
+			player.getResources().addRandom(STARTING_RESOURCES);
+		}
 
 		determineTurnOrder();
 	}
@@ -263,7 +271,9 @@ public class Catan {
 
 	/**
 	 * Distributes the produced resources for this turn
-	 * @throws BoardNotInitializedException if the {@link Board} has not been initialized
+	 * 
+	 * @throws BoardNotInitializedException
+	 *             if the {@link Board} has not been initialized
 	 */
 	public void distributeTurnResources() throws BoardNotInitializedException {
 		int frequency = Dice.doubleRoll();
@@ -279,7 +289,7 @@ public class Catan {
 			}
 		});
 	}
-	
+
 	/**
 	 * Runs the main loop for this {@link Catan}
 	 * 
@@ -412,13 +422,40 @@ public class Catan {
 		}
 	}
 
-	public static void main(String[] args) throws PlayerCountOutOfBoundsException, PlayerIndexOutOfBoundsException,
-			BoardNotInitializedException, BoardObjectNotInitializedException, InvalidLocationException,
-			TileNotInitializedException, VertexNotInitializedException {
+	/**
+	 * Starts a new game of {@link Catan}
+	 * 
+	 * @param playerCount
+	 *            the number of players
+	 * @param board
+	 *            the {@link Board} to play on, null for a random {@link Board}
+	 * @param menu
+	 *            the calling {@link MainMenu}
+	 * @throws PlayerIndexOutOfBoundsException
+	 *             if an invalid player index is supplied
+	 * @throws PlayerCountOutOfBoundsException
+	 *             if an invalid playerCount is supplied
+	 * @throws BoardNotInitializedException
+	 *             if the {@link Board} is not initialized
+	 * @throws InvalidLocationException
+	 *             if an {@link InvalidLocationException} is thrown within the
+	 *             game
+	 * @throws VertexNotInitializedException
+	 *             if any uninitialized {@link Vertex} (vertices) are accessed
+	 * @throws TileNotInitializedException
+	 *             if any uninitialized {@link Tile}s are accessed
+	 */
+	public static void startCatan(int playerCount, Board board, MainMenu menu)
+			throws PlayerCountOutOfBoundsException, PlayerIndexOutOfBoundsException, BoardNotInitializedException,
+			TileNotInitializedException, VertexNotInitializedException, InvalidLocationException {
+		Catan catan;
+		if (playerCount > 0) {
+			catan = new Catan(playerCount);
+		} else {
+			catan = new Catan();
+		}
 
-		Catan catan = new Catan();
-
-		catan.setBoard(Board.randomLandBoard());
+		catan.setBoard(board != null ? board : Board.randomLandBoard());
 
 		JFrame frame = new JFrame("Catan") {
 			@Override
@@ -426,6 +463,7 @@ public class Catan {
 				super.dispose();
 				catan.destroyToolBox();
 				catan.breakGameLoop();
+				menu.setVisible(true);
 			}
 		};
 
@@ -446,5 +484,32 @@ public class Catan {
 		catan.setUp();
 
 		catan.gameLoop();
+
+		menu.setVisible(true);
+	}
+
+	/**
+	 * Starts a new game of {@link Catan}
+	 * 
+	 * @param menu
+	 *            the calling {@link MainMenu}
+	 * @throws PlayerIndexOutOfBoundsException
+	 *             if an invalid player index is supplied
+	 * @throws PlayerCountOutOfBoundsException
+	 *             if an invalid playerCount is supplied
+	 * @throws BoardNotInitializedException
+	 *             if the {@link Board} is not initialized
+	 * @throws InvalidLocationException
+	 *             if an {@link InvalidLocationException} is thrown within the
+	 *             game
+	 * @throws VertexNotInitializedException
+	 *             if any uninitialized {@link Vertex} (vertices) are accessed
+	 * @throws TileNotInitializedException
+	 *             if any uninitialized {@link Tile}s are accessed
+	 */
+	public static void startCatan(MainMenu menu)
+			throws PlayerCountOutOfBoundsException, PlayerIndexOutOfBoundsException, BoardNotInitializedException,
+			TileNotInitializedException, VertexNotInitializedException, InvalidLocationException {
+		startCatan(-1, null, menu);
 	}
 }

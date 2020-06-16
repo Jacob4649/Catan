@@ -23,7 +23,11 @@ public class IO {
 	 * @return an array of {@link File}s storing {@link Board} layouts
 	 */
 	public static File[] getSavedBoards() {
-		ArrayList<File> output = new ArrayList<File>(Arrays.asList(new File(BOARD_DIRECTORY).listFiles()));
+		File[] files = new File(System.getProperty("user.dir") + BOARD_DIRECTORY).listFiles();
+		ArrayList<File> output = new ArrayList<File>();
+		if (files != null) {
+			output = new ArrayList<File>(Arrays.asList(files));	
+		}
 		int i = 0;
 		while (i < output.size()) {
 			if (output.get(i).getName().substring(output.get(i).getName().length() - BOARD_EXTENSION.length())
@@ -147,7 +151,7 @@ public class IO {
 	 * @return a fileName for the ith layout {@link File}
 	 */
 	private static String getFileName(int i) {
-		return System.getProperty("user.dir") + "/" + BOARD_DIRECTORY + BOARD_NAME + (i != 0 ? "_" + i : "")
+		return System.getProperty("user.dir") + BOARD_DIRECTORY + BOARD_NAME + (i != 0 ? "_" + i : "")
 				+ BOARD_EXTENSION;
 	}
 
@@ -158,7 +162,7 @@ public class IO {
 	 * @return a {@link File} for this {@link Board} to be saved in
 	 */
 	public static File toBoardFile(String name) {
-		return new File(System.getProperty("user.dir") + "/" + BOARD_DIRECTORY + name + BOARD_EXTENSION);
+		return new File(System.getProperty("user.dir") + BOARD_DIRECTORY + name + BOARD_EXTENSION);
 	}
 
 }
