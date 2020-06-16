@@ -130,7 +130,7 @@ public abstract class BoardObject<T> {
 		if (m_owner != null) {
 			Graphics2D g2D = m_image.createGraphics();
 			g2D.setColor(m_owner.getColor().getColor());
-			g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.25f));
+			g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.5f));
 			g2D.fillRect(0, 0, m_image.getWidth(), m_image.getHeight());
 		}
 

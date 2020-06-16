@@ -42,6 +42,7 @@ public class MapsMenu {
 		m_frame = new JFrame();
 		m_frame.setBounds(550, 100, 450, 300);
 		m_frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		m_frame.setResizable(false);
 		m_frame.getContentPane().setLayout(new BoxLayout(m_frame.getContentPane(), BoxLayout.Y_AXIS));
 		
 		m_frame.getContentPane().add(Box.createVerticalStrut(20));

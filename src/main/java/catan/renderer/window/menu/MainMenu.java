@@ -48,6 +48,7 @@ public class MainMenu {
 		m_frame = new JFrame();
 		m_frame.setBounds(100, 100, 450, 300);
 		m_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		m_frame.setResizable(false);
 		m_frame.getContentPane().setLayout(null);
 
 		JLabel menuLabel = new JLabel("Jacob's Catan");

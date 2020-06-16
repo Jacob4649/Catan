@@ -27,10 +27,7 @@ import catan.engine.player.Player;
 import catan.engine.player.PlayerColor;
 import catan.engine.player.PlayerCountOutOfBoundsException;
 import catan.engine.player.PlayerIndexOutOfBoundsException;
-import catan.engine.resources.PurchaseCosts;
-import catan.engine.resources.ResourceBundle;
 import catan.engine.resources.ResourceMetric;
-import catan.engine.resources.trading.TradeExchange;
 import catan.renderer.panel.BoardPanel;
 import catan.renderer.window.construction.ConstructionToolBox;
 import catan.renderer.window.construction.InitialConstructionToolBox;
@@ -43,6 +40,39 @@ import catan.renderer.window.menu.MainMenu;
  * Course Summative - Catan Game
  * 
  * All code is original.
+ * Catan is a turn based, strategy where players 
+ * compete for control of a newly discovered island. 
+ * Points are won by building villages and/or cities. 
+ * Cities are 2 points while villages are 1. 
+ * The first player to accumulate 10 points wins the game.
+ * Resources are needed to build villages and upgrade 
+ * them into cities. These resources are taken from the territory surrounding 
+ * your existing cities/villages. Every turn, a two dice are rolled. If the
+ * sum of the numbers on the dice is equivalent to the number on a tile. 
+ * Any villages on vertices contacting that tile will get 
+ * one resource of the type that tile produces. 
+ * Cities will get two resources. Resources may also be traded for.
+ * If you have 3 of one resource, you may exchange all 3 of 
+ * them for 1 of another resource. All 3 resources must be of the same type.
+ * You may only build villages on roads. 
+ * You may also not build a village adjacent to an existing village.
+ * Roads may only be constructed with one point contacting an existing road.
+ * Each player starts with 2 villages and 2 roads.
+ * 
+ * Games are played on maps composed of tiles. 
+ * These maps are either randomly generated,
+ * or loaded in. The game comes with a built in map editor, 
+ * as well as several pre-made maps for you to play on.
+ * 
+ * Pressing the 'Quickstart Game' button in the menu begins a 
+ * game with default settings - a 6x6 random map, and 4 players.
+ * If 'New Game' if pressed instead, the game setup screen will open.
+ * Here players can specify how many players, the type of map (random or pre-loaded),
+ * the map dimensions (only if random), or which map to use (if loading in a map).
+ * 
+ * The game is played with one player and between 1 and 4 AI opponents.
+ * The AI opponents do not collude and are competing against each other
+ * as much as the player is competing against them.
  * 
  */
 

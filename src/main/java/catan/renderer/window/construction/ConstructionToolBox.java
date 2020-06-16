@@ -2,7 +2,10 @@ package catan.renderer.window.construction;
 
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -14,6 +17,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.KeyStroke;
 
 import catan.Catan;
 import catan.engine.board.BoardNotInitializedException;
@@ -32,6 +36,7 @@ import catan.engine.board.tile.VertexNotInitializedException;
 import catan.engine.moves.PurchaseMove;
 import catan.renderer.panel.BoardPanel;
 import catan.renderer.window.resources.ResourceMetricWindow;
+import catan.renderer.window.resources.TradeWindow;
 
 /**
  * Class representing toolbox window the user uses to pick actions on their turn
@@ -46,6 +51,7 @@ public class ConstructionToolBox extends JFrame {
 	private Vertex m_selectHistory = null;
 
 	private ResourceMetricWindow m_resourceWindow;
+	private TradeWindow m_tradeWindow;
 
 	private Catan m_catan;
 	private JTextField m_wood, m_clay, m_stone, m_grain, m_sheep, m_selectedTile;
@@ -88,6 +94,7 @@ public class ConstructionToolBox extends JFrame {
 		setResizable(false);
 
 		m_panel = new JPanel();
+		
 		JScrollPane scrollPane = new JScrollPane(m_panel);
 
 		m_panel.setLayout(new BoxLayout(m_panel, BoxLayout.Y_AXIS));
@@ -140,6 +147,21 @@ public class ConstructionToolBox extends JFrame {
 						e.printStackTrace();
 						System.exit(0);
 					}
+				});
+			}
+		});
+
+		m_panel.add(Box.createVerticalStrut(20));
+
+		m_panel.add(new JButton("Trade") {
+			{
+				setAlignmentX(Component.CENTER_ALIGNMENT);
+				setAlignmentY(Component.CENTER_ALIGNMENT);
+				addActionListener((performedAction) -> {
+					if (m_tradeWindow != null) {
+						m_tradeWindow.dispose();
+					}
+					m_tradeWindow = new TradeWindow(m_catan);
 				});
 			}
 		});
@@ -403,6 +425,9 @@ public class ConstructionToolBox extends JFrame {
 		super.dispose();
 		if (m_resourceWindow != null) {
 			m_resourceWindow.dispose();
+		}
+		if (m_tradeWindow != null) {
+			m_tradeWindow.dispose();
 		}
 		m_catan.getPlayer().getResources().setOnChangeListener(null);
 	}

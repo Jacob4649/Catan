@@ -47,6 +47,8 @@ public class ResourceMetricWindow extends JFrame {
 	public ResourceMetricWindow(ResourceMetric metric, String title) {
 		super(title);
 
+		setResizable(false);
+		
 		getContentPane().add(new JPanel() {
 			{
 				setBorder(BorderFactory.createLineBorder(Colors.RESOURCE_BORDER_COLOR));

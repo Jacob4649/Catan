@@ -154,7 +154,7 @@ public abstract class EdgeObject extends BoardObject<Edge> {
 		if (getOwner() != null) {
 			Graphics2D g2D = m_image.createGraphics();
 			g2D.setColor(getOwner().getColor().getColor());
-			g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.25f));
+			g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.5f));
 			g2D.fillRect(0, 0, m_image.getWidth(), m_image.getHeight());
 		}
 

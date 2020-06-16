@@ -49,6 +49,7 @@ public class GameOver {
 		m_frame.setModalityType(ModalityType.APPLICATION_MODAL);
 		m_frame.setBounds(100, 100, 250, 150);
 		m_frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		m_frame.setResizable(false);
 		m_frame.getContentPane().setLayout(new BoxLayout(m_frame.getContentPane(), BoxLayout.Y_AXIS));
 
 		m_frame.getContentPane().add(Box.createVerticalStrut(20));

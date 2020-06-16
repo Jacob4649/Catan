@@ -1,7 +1,5 @@
 package catan.engine.resources.trading;
 
-import java.util.Arrays;
-
 import catan.engine.player.Player;
 import catan.engine.resources.Purchase;
 import catan.engine.resources.PurchaseCosts;
@@ -100,7 +98,7 @@ public class TradeExchange implements Purchase {
 				totalMissing--;
 			}
 		}
-
+		
 		if (totalMissing > 0) {
 			TradeInfo info = new TradeInfo();
 			info.m_tradeAffordable = false;
@@ -108,20 +106,21 @@ public class TradeExchange implements Purchase {
 		} else {
 			TradeInfo info = new TradeInfo();
 			info.m_tradeAffordable = true;
-			
+
 			int missingIndex = 0;
 			for (int resource = 0; resource < trades.length; resource++) {
 				for (int i = 0; i < trades[resource]; i++) {
 					if (missing[missingIndex] > 0) {
-						info.m_trades.add(new TradeExchange(resource, missingIndex));	
+						info.m_trades.add(new TradeExchange(resource, missingIndex));
+						missing[missingIndex]--;
 					} else {
 						missingIndex++;
 						i--;
 					}
 				}
 			}
-			
-			return info;	
+
+			return info;
 		}
 	}
 
@@ -161,5 +160,11 @@ public class TradeExchange implements Purchase {
 		int[] output = new int[] { 0, 0, 0, 0, 0 };
 		output[m_output] = PurchaseCosts.TRADEEXCHANGE_YIELD;
 		return new ResourceBundle(output);
+	}
+
+	@Override
+	public String toString() {
+		return "TradeExchange: (" + PurchaseCosts.TRADEEXCHANGE_COST + "x " + ResourceBundle.toString(m_input) + " For "
+				+ PurchaseCosts.TRADEEXCHANGE_YIELD + "x " + ResourceBundle.toString(m_output) + ")";
 	}
 }

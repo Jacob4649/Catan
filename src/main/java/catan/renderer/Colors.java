@@ -11,7 +11,7 @@ public class Colors {
 
 	public static final Color PLAYER_WHITE = Color.WHITE;
 
-	public static final Color PLAYER_YELLOW = Color.YELLOW;
+	public static final Color PLAYER_YELLOW = Color.ORANGE;
 
 	public static final Color BOARD_BORDER_COLOR = Color.BLACK;
 
