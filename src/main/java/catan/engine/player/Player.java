@@ -7,9 +7,11 @@ import catan.engine.board.objects.InvalidLocationException;
 import catan.engine.board.objects.buildings.City;
 import catan.engine.board.objects.buildings.Village;
 import catan.engine.moves.Move;
+import catan.engine.moves.PurchaseMove;
 import catan.engine.resources.Purchase;
 import catan.engine.resources.ResourceBundle;
 import catan.engine.resources.ResourceMetric;
+import catan.engine.resources.trading.TradeExchange;
 
 /**
  * Class representing a single player (can be user or opponent)
@@ -100,9 +102,21 @@ public class Player {
 	 *             if the {@link Board} is not initialized
 	 */
 	public void takeTurn(Catan catan) throws BoardNotInitializedException, InvalidLocationException {
+		// Ran out of time for proper move selection
 		Move[] moves = catan.getBoard().getMovesForPlayer(this);
 		if (moves.length > 0) {
-			moves[(int) (Math.random() * moves.length)].apply();	
+			Move move = moves[(int) (Math.random() * moves.length)];
+
+			if (move instanceof PurchaseMove
+					&& !getResources().greaterOrEqualTo(((PurchaseMove) move).getPurchase().getCost())) {
+				// can't afford, needs to trade
+				for (TradeExchange trade : TradeExchange.getTradeStats(getResources(),
+						((PurchaseMove) move).getPurchase().getCost()).m_trades) {
+					new PurchaseMove(trade, this).apply();
+				}
+			}
+
+			move.apply();
 		}
 	}
 

@@ -346,7 +346,10 @@ public class Catan {
 	 */
 	public synchronized void gameLoop() throws BoardNotInitializedException, InvalidLocationException {
 		while (!m_end) {
-			distributeTurnResources();
+			if (m_turn == 0) {
+				// only run once per turn
+				distributeTurnResources();
+			}
 			if (getActivePlayer() == getPlayer()) {
 				createToolBox();
 				while (getActivePlayer() == getPlayer() && !m_end) {

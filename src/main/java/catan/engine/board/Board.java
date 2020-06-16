@@ -24,6 +24,7 @@ import catan.engine.player.Player;
 import catan.engine.resources.PurchaseCosts;
 import catan.engine.resources.ResourceBundle;
 import catan.engine.resources.ResourceMetric;
+import catan.engine.resources.trading.TradeExchange;
 
 /**
  * Class representing the board for a game of {@link Catan} Tile positions are
@@ -338,13 +339,15 @@ public class Board {
 	 */
 	public Move[] getMovesForPlayer(Player player) throws BoardNotInitializedException, InvalidLocationException {
 		ArrayList<Move> moves = new ArrayList<Move>();
-		if (player.getResources().greaterOrEqualTo(PurchaseCosts.VILLAGE_COST)) {
+		if (player.getResources().greaterOrEqualTo(PurchaseCosts.VILLAGE_COST)
+				|| TradeExchange.getTradeStats(player.getResources(), PurchaseCosts.VILLAGE_COST).m_tradeAffordable) {
 			for (Vertex vertex : Village.getValidLocations(this, player)) {
 				moves.add(new PurchaseMove(new ConstructVillage(new Village(player, vertex)), player));
 			}
 		}
 
-		if (player.getResources().greaterOrEqualTo(PurchaseCosts.CITY_COST)) {
+		if (player.getResources().greaterOrEqualTo(PurchaseCosts.CITY_COST)
+				|| TradeExchange.getTradeStats(player.getResources(), PurchaseCosts.CITY_COST).m_tradeAffordable) {
 			for (BoardObject village : getAllObjectsMatching((object) -> {
 				return object instanceof Village && ((Village) object).getOwner() == player;
 			})) {
@@ -352,7 +355,8 @@ public class Board {
 			}
 		}
 
-		if (player.getResources().greaterOrEqualTo(PurchaseCosts.ROAD_COST)) {
+		if (player.getResources().greaterOrEqualTo(PurchaseCosts.ROAD_COST)
+				|| TradeExchange.getTradeStats(player.getResources(), PurchaseCosts.ROAD_COST).m_tradeAffordable) {
 			for (Edge edge : Road.getValidLocations(this, player)) {
 				moves.add(new PurchaseMove(new ConstructRoad(new Road(player, edge)), player));
 			}
@@ -404,17 +408,17 @@ public class Board {
 			weights[ResourceBundle.CLAY] -= 1;
 
 		}
-		
+
 		int resource = tile.getTileType().getResource();
-		
+
 		if (resource == ResourceBundle.NULL) {
 			return 0;
 		}
-		
+
 		int prodDiff = (gameStage / 2) - metric.getRawMetric()[resource];
 
 		int weighted = weights[resource] * Tile.getFrequencyProbability(tile.getFrequency());
-		
+
 		return weighted + prodDiff;
 	}
 
