@@ -430,6 +430,7 @@ public class ConstructionToolBox extends JFrame {
 			m_tradeWindow.dispose();
 		}
 		m_catan.getPlayer().getResources().setOnChangeListener(null);
+		m_catan.getBoardPanel().deselect();
 	}
 
 }

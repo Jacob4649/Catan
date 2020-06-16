@@ -246,6 +246,15 @@ public class ResourceBundle {
 	}
 
 	@Override
+	public boolean equals(Object bundle) {
+		return bundle instanceof ResourceBundle && ((ResourceBundle) bundle).getWood() == getWood()
+				&& ((ResourceBundle) bundle).getClay() == getClay()
+				&& ((ResourceBundle) bundle).getStone() == getStone()
+				&& ((ResourceBundle) bundle).getGrain() == getGrain()
+				&& ((ResourceBundle) bundle).getSheep() == getSheep();
+	}
+
+	@Override
 	public ResourceBundle clone() {
 		return new ResourceBundle(getWood(), getClay(), getStone(), getGrain(), getSheep());
 	}

@@ -46,4 +46,8 @@ public class Colors {
 	public static final Color RESOURCE_BACKGROUND_COLOR = Color.WHITE;
 	
 	public static final Color RESOURCE_TEXT = Color.BLACK;
+	
+	public static final Color BOARD_MESSAGE_BACKGROUND = Color.GRAY;
+	
+	public static final Color BOARD_MESSAGE = Color.WHITE;
 }

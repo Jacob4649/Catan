@@ -74,6 +74,8 @@ import catan.renderer.window.menu.MainMenu;
  * The AI opponents do not collude and are competing against each other
  * as much as the player is competing against them.
  * 
+ * The password for the game is 'Catan123' (no apostrophes).
+ * 
  */
 
 /**
@@ -92,6 +94,8 @@ public class Catan {
 	public static final int STARTING_RESOURCES = 7;
 
 	public static final int MAX_VICTORY_POINTS = 10;
+
+	public static final int GET_RESOURCE_TIME = 200;
 
 	private Player[] m_players;
 	private Board m_board;
@@ -312,17 +316,23 @@ public class Catan {
 	 */
 	public void distributeTurnResources() throws BoardNotInitializedException {
 		int frequency = Dice.doubleRoll();
+		getBoardPanel().showMessage("Rolled " + frequency + ", Getting Resources");
+		getBoardPanel().setSelectObject(true);
 		getBoard().forAllObjects((object) -> {
 			if (object instanceof Productive) {
 				try {
-					((Productive) object).giveResourcesToOwner(frequency);
+					if (((Productive) object).giveResourcesToOwner(frequency)) {
+						getBoardPanel().setSelectedObject(object);
+						Thread.sleep(GET_RESOURCE_TIME);
+					}
 				} catch (TileNotInitializedException | BoardNotInitializedException | VertexNotInitializedException
-						| BoardObjectNotInitializedException | NoOwnerException e) {
+						| BoardObjectNotInitializedException | NoOwnerException | InterruptedException e) {
 					e.printStackTrace();
 					System.exit(0);
 				}
 			}
 		});
+		getBoardPanel().hideMessage();
 	}
 
 	/**

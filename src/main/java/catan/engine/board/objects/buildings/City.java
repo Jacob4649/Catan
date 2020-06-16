@@ -207,12 +207,14 @@ public class City extends VertexObject implements Productive {
 	 *             if this {@link City} is not owned by an {@link Player}
 	 */
 	@Override
-	public void giveResourcesToOwner(int frequency) throws TileNotInitializedException, BoardNotInitializedException,
+	public boolean giveResourcesToOwner(int frequency) throws TileNotInitializedException, BoardNotInitializedException,
 			VertexNotInitializedException, BoardObjectNotInitializedException, NoOwnerException {
 		if (getOwner() == null) {
 			throw new NoOwnerException(this);
 		}
-		getOwner().getResources().add(getResources(frequency));
+		ResourceBundle resources = getResources(frequency);
+		getOwner().getResources().add(resources);
+		return !resources.equals(new ResourceBundle());
 	}
 
 	/**

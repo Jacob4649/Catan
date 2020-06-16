@@ -48,7 +48,8 @@ public class Rules {
 			+ "map dimensions (only if random), or which map to use (if loading in a map).\n\n"
 			+ "The game is played with one player and between 1 and 4 AI opponents. "
 			+ "The AI opponents do not collude and are competing against each other "
-			+ "as much as the player is competing against them.";
+			+ "as much as the player is competing against them.\n\n"
+			+ "The password for the game is 'Catan123' (no apostrophes).";
 
 	/**
 	 * Creates a new {@link Rules}

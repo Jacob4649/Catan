@@ -3,6 +3,7 @@ package catan.renderer.panel;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.MouseInfo;
@@ -46,6 +47,11 @@ public class BoardPanel extends JPanel {
 
 	private static final double VERTEX_INDICATOR_RELATIVE_SIZE = 0.4;
 
+	private boolean m_useDuration = false;
+	private long m_messageDuration = 0;
+	private long m_messageStartTime = 0;
+	private String m_message = "";
+	private boolean m_showMessage = false;
 	private boolean m_mouseLock = false;
 	private boolean m_preSelectionIndicator = false;
 	private boolean m_selectVertex = false;
@@ -327,6 +333,36 @@ public class BoardPanel extends JPanel {
 			}
 
 			// paint ui details
+			if (m_showMessage) {
+				// if message
+				g2D.setColor(Colors.BOARD_MESSAGE_BACKGROUND);
+				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.75f));
+				g2D.setStroke(new BasicStroke(5f));
+				g2D.setFont(new Font("Arial", Font.PLAIN, 40));
+
+				int textWidth = g2D.getFontMetrics().stringWidth(m_message);
+				int textHeight = g2D.getFontMetrics().getHeight();
+
+				int height = textHeight + 80; // 40 px of padding either side
+
+				int startHeight = (getHeight() / 2) - (height / 2);
+
+				g2D.fillRect(0, startHeight, getWidth(), height);
+
+				g2D.setColor(Colors.BOARD_MESSAGE);
+				g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+
+				int textStartHeight = (getHeight() / 2) + (textHeight / 2);
+				int textStartWidth = (getWidth() / 2) - (textWidth / 2);
+
+				g2D.drawString(m_message, textStartWidth, textStartHeight);
+
+				if (m_useDuration) {
+					if (System.currentTimeMillis() > m_messageStartTime + m_messageDuration) {
+						hideMessage();
+					}
+				}
+			}
 
 		} catch (BoardNotInitializedException e) {
 			e.printStackTrace();
@@ -339,6 +375,43 @@ public class BoardPanel extends JPanel {
 	@Override
 	public Dimension getPreferredSize() {
 		return new Dimension(PANEL_HORIZONTAL, PANEL_VERTICAL);
+	}
+
+	/**
+	 * Hides the currently shown message
+	 */
+	public void hideMessage() {
+		m_showMessage = false;
+		m_message = "";
+		m_messageStartTime = 0;
+		m_messageDuration = 0;
+		m_useDuration = false;
+	}
+
+	/**
+	 * Shows the specified message
+	 * 
+	 * @param message
+	 *            the message to show
+	 */
+	public void showMessage(String message) {
+		m_message = message;
+		m_showMessage = true;
+	}
+
+	/**
+	 * Shows the specified message
+	 * 
+	 * @param message
+	 *            the message to show
+	 * @param time
+	 *            time to show for in milliseconds
+	 */
+	public void showMessage(String message, long time) {
+		showMessage(message);
+		m_useDuration = true;
+		m_messageDuration = time;
+		m_messageStartTime = System.currentTimeMillis();
 	}
 
 	/**

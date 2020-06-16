@@ -63,6 +63,7 @@ public interface Productive {
 	 * 
 	 * @param frequency
 	 *            the int frequency for that turn
+	 * @return true if any resources were fetched
 	 * @throws BoardObjectNotInitializedException
 	 *             if this {@link VertexObject} has not been initialized
 	 * @throws VertexNotInitializedException
@@ -76,7 +77,7 @@ public interface Productive {
 	 *             if this {@link VertexObject} is not owned by an
 	 *             {@link Player}
 	 */
-	public void giveResourcesToOwner(int frequency) throws TileNotInitializedException, BoardNotInitializedException,
+	public boolean giveResourcesToOwner(int frequency) throws TileNotInitializedException, BoardNotInitializedException,
 			VertexNotInitializedException, BoardObjectNotInitializedException, NoOwnerException;
 
 }
