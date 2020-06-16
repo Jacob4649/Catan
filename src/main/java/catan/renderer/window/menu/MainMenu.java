@@ -1,11 +1,10 @@
 package catan.renderer.window.menu;
 
-import java.awt.EventQueue;
+import java.awt.Font;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import java.awt.BorderLayout;
-import java.awt.Component;
 import javax.swing.SwingConstants;
 
 import catan.Catan;
@@ -15,13 +14,6 @@ import catan.engine.board.tile.TileNotInitializedException;
 import catan.engine.board.tile.VertexNotInitializedException;
 import catan.engine.player.PlayerCountOutOfBoundsException;
 import catan.engine.player.PlayerIndexOutOfBoundsException;
-
-import java.awt.Font;
-import javax.swing.JButton;
-import javax.swing.BoxLayout;
-import java.awt.GridLayout;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 
 /**
  * Class representing the application's main menu
@@ -97,6 +89,11 @@ public class MainMenu {
 
 		JButton rules = new JButton("Rules");
 		rules.setBounds(10, 227, 100, 23);
+		
+		rules.addActionListener((performedAction) -> {
+			new Rules();
+		});
+		
 		m_frame.getContentPane().add(rules);
 
 		JButton quit = new JButton("Quit");
